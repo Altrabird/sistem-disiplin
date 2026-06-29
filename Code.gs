@@ -18,7 +18,10 @@
  *  dan masukkan PIN sama dalam Tetapan app. Biarkan '' untuk tiada PIN.
  */
 
-const PIN          = '';                       // cth: '169298' untuk kunci tulisan. '' = tiada PIN
+// PENTING: Jika URL /exec didedahkan secara umum (cth dlm repo awam), WAJIB tetapkan PIN
+// di sini supaya bacaan & tulisan data dikunci. Tetapkan dlm projek skrip ANDA sahaja —
+// JANGAN commit PIN sebenar ke repo awam. '' = tiada PIN (endpoint terbuka).
+const PIN          = '';                       // cth: '169298'
 const SHEET_NAME   = 'Kes';
 const FOLDER_NAME  = 'Bukti Disiplin SKBT';
 
@@ -67,8 +70,12 @@ function checkPin_(token){ return !PIN || String(token) === String(PIN); }
 
 /* ---------- API: GET (senarai / ping) ---------- */
 function doGet(e){
-  const action = (e && e.parameter && e.parameter.action) || 'list';
+  const p = (e && e.parameter) || {};
+  const action = p.action || 'list';
+  // ping terbuka (tiada data sensitif) supaya app boleh semak kebolehcapaian & sama ada PIN diperlukan
   if (action === 'ping') return json_({ ok:true, msg:'Sistem Disiplin GAS aktif', pin: !!PIN, roster: !!ROSTER_ID });
+  // semua bacaan data dikunci dengan PIN
+  if (!checkPin_(p.token)) return json_({ ok:false, error:'PIN tidak sah' });
   if (action === 'list') return json_({ ok:true, data: listKes_() });
   if (action === 'students') return json_({ ok:true, data: listStudents_() });
   if (action === 'info') return json_({ ok:true, sheetUrl: sheet_().getParent().getUrl(), folderUrl: folder_().getUrl() });

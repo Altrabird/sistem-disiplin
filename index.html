@@ -508,10 +508,10 @@ tbody tr:hover{background:var(--surface-2);}
         </div>
         <div class="card">
           <div class="card-h"><h3><svg class="ic"><use href="#i-cloud"/></svg> Mode Penyimpanan Data</h3><span class="mode-badge" id="modeBadge2">Luar Talian</span></div>
-          <p class="hint" style="margin-bottom:14px">Tampal URL Web App Google Apps Script untuk menyimpan kes &amp; foto bukti ke <b>Google Sheet + Drive</b> akaun anda (boleh dikongsi antara peranti). Biarkan kosong untuk simpan dalam pelayar ini sahaja.</p>
+          <p class="hint" style="margin-bottom:14px">URL Web App telah <b>ditetapkan secara lalai</b> & dikunci dengan PIN. Cuma <b>masukkan PIN</b> sekali pada setiap peranti, kemudian klik Simpan &amp; Sambung. (Kosongkan URL untuk mod luar talian.)</p>
           <div class="form-grid">
             <div class="field full"><label>URL Web App (Google Apps Script)</label><input id="set-api" placeholder="https://script.google.com/macros/s/.../exec"></div>
-            <div class="field"><label>PIN (jika ditetapkan dalam skrip)</label><input id="set-pin" placeholder="Pilihan — biarkan kosong jika tiada"></div>
+            <div class="field"><label>PIN Sistem <span class="req">*</span></label><input id="set-pin" placeholder="Masukkan PIN sistem disiplin" autocomplete="off"></div>
           </div>
           <div style="display:flex;gap:10px;flex-wrap:wrap">
             <button class="btn primary" onclick="saveSettings(true)"><svg class="ic"><use href="#i-check"/></svg> Simpan &amp; Sambung</button>
@@ -660,15 +660,18 @@ function cadangTindakan(katId, tahap, kekerapan){
 
 /* ====================== STATE ====================== */
 const LS_CASES='udk_cases_v1', LS_SET='udk_settings_v1';
+// URL Web App Google Apps Script lalai (dikunci dengan PIN di backend).
+const DEFAULT_API='https://script.google.com/macros/s/AKfycbxrypP6OHf0sJkUXcRS2bO32NBz-D8AHRlYLIkkj0cZMCozFFHEfzT9Mp8i9DRmDWxp9A/exec';
 let CASES = load(LS_CASES, []);
-let SETTINGS = load(LS_SET, {nama:'Sekolah Kebangsaan Bandar Tawau',kod:'XBA3051',guru:'Harsidi bin Junick',sesi:'2025 / 2026',api:'',pin:''});
+let SETTINGS = load(LS_SET, {nama:'Sekolah Kebangsaan Bandar Tawau',kod:'XBA3051',guru:'Harsidi bin Junick',sesi:'2025 / 2026',api:DEFAULT_API,pin:''});
+if(SETTINGS.api===undefined||SETTINGS.api==='')SETTINGS.api=DEFAULT_API;   // pastikan lalai pada peranti sedia ada
 function load(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d;}catch(e){return d;}}
 function save(){localStorage.setItem(LS_CASES,JSON.stringify(CASES));localStorage.setItem(LS_SET,JSON.stringify(SETTINGS));}
 function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,6);}
 
 /* ---------- CLOUD (Google Apps Script) ---------- */
 function CLOUD(){return (SETTINGS.api||'').trim();}
-async function apiGet(qs){const r=await fetch(CLOUD()+'?'+qs);return r.json();}
+async function apiGet(qs){const r=await fetch(CLOUD()+'?'+qs+'&token='+encodeURIComponent(SETTINGS.pin||''));return r.json();}
 async function apiPost(body){body.token=SETTINGS.pin||'';const r=await fetch(CLOUD(),{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(body)});return r.json();}
 function setMode(state){
   const map={offline:['Luar Talian',''],cloud:['Awan · Tersambung','cloud'],loading:['Menyambung…','loading'],error:['Awan · Ralat','error']};
@@ -679,9 +682,9 @@ function setMode(state){
 function upsert(rec){const i=CASES.findIndex(x=>String(x.id)===String(rec.id));if(i>-1)CASES[i]={...CASES[i],...rec};else CASES.push(rec);}
 async function cloudLoad(){
   setMode('loading');
-  try{const res=await apiGet('action=list');if(!res.ok)throw new Error(res.error);
+  try{const res=await apiGet('action=list');if(!res.ok)throw new Error(res.error||'ralat');
     CASES=(res.data||[]).map(c=>({...c,kategori:c.kategori}));save();setMode('cloud');}
-  catch(e){setMode('error');toast('Gagal sambung awan — guna salinan tempatan');}
+  catch(e){setMode('error');toast(/pin/i.test(e.message)?'PIN diperlukan — masukkan PIN di Tetapan & Data':'Gagal sambung awan — guna salinan tempatan');}
   renderDashboard();renderRecords();renderRisiko();
   loadRoster();
 }
@@ -1129,8 +1132,12 @@ function saveSettings(connect){
 async function testConnection(){
   const url=val('set-api');if(!url){toast('Sila masukkan URL Web App dahulu');return;}
   SETTINGS.api=url;SETTINGS.pin=val('set-pin');setMode('loading');
-  try{const res=await apiGet('action=ping');if(res.ok){setMode('cloud');toast('Sambungan berjaya — sistem awan aktif');loadRoster();}else throw new Error(res.error);}
-  catch(e){setMode('error');toast('Sambungan gagal — semak URL & tetapan deployment');}
+  try{
+    const ping=await apiGet('action=ping');
+    if(!ping.ok)throw new Error('unreachable');
+    if(ping.pin){const chk=await apiGet('action=list');if(!chk.ok){setMode('error');toast('PIN salah atau diperlukan — semak PIN');return;}}
+    setMode('cloud');toast('Sambungan berjaya — sistem awan aktif');loadRoster();
+  }catch(e){setMode('error');toast('Sambungan gagal — semak URL & tetapan deployment');}
 }
 function exportJSON(){dl(JSON.stringify({cases:CASES,settings:SETTINGS,exported:new Date().toISOString()},null,2),'sandaran-disiplin-'+Date.now()+'.json','application/json');toast('Sandaran dieksport');}
 function importJSON(e){const f=e.target.files[0];if(!f)return;

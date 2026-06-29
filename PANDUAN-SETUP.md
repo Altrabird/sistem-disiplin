@@ -62,7 +62,8 @@ Syarat: akaun Google yang anda guna untuk deploy skrip ini **mesti ada akses (se
 
 - Data & foto disimpan dalam **akaun Google anda**, bukan pihak ketiga.
 - Foto ditetapkan "sesiapa dengan pautan boleh lihat" supaya dapat dipaparkan dalam app. Pautannya rawak & sukar diteka, tetapi **jangan kongsi URL foto secara terbuka**.
-- Untuk keselamatan tambahan, set **PIN** dalam `Code.gs` (baris `const PIN = ''`) — hanya orang yang tahu PIN boleh menyimpan/memadam.
+- **PIN diwajibkan** kerana URL `/exec` kini ditetapkan sebagai lalai dalam app awam. Tetapkan PIN dalam `Code.gs` (baris `const PIN = '169298'`) **dalam projek skrip anda sahaja** — jangan commit PIN sebenar ke repo awam. Tanpa PIN yang betul, semua bacaan & tulisan data ditolak, jadi URL awam tidak berguna kepada orang luar.
+- Masukkan PIN yang sama dalam app (**Tetapan & Data ▸ PIN Sistem**) sekali pada setiap peranti.
 - Untuk mematikan mode awan, kosongkan medan URL dalam Tetapan & klik Simpan — app kembali ke simpanan pelayar (luar talian).
 
 ## Kemas kini skrip kemudian
