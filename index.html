@@ -227,6 +227,35 @@ tbody tr:hover{background:var(--surface-2);}
 .lightbox{align-items:center;justify-content:center;cursor:zoom-out;padding:30px;}
 .lightbox img{max-width:92vw;max-height:90vh;border-radius:12px;box-shadow:var(--sh-lg);}
 
+/* ===== risk cards ===== */
+.risk-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:16px;}
+.risk-card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--sh-sm);overflow:hidden;cursor:pointer;transition:transform .18s,box-shadow .18s;border-left:4px solid var(--ink-3);}
+.risk-card:hover{transform:translateY(-3px);box-shadow:var(--sh);}
+.risk-card.lvl-Kritikal{border-left-color:#dc2626;} .risk-card.lvl-Tinggi{border-left-color:#ea580c;}
+.risk-card.lvl-Sederhana{border-left-color:#d97706;} .risk-card.lvl-Rendah{border-left-color:#16a34a;}
+.rc-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;padding:16px 18px 12px;}
+.rc-name{font-size:15px;font-weight:700;line-height:1.2;}
+.rc-name span{display:block;font-size:11.5px;color:var(--ink-2);font-weight:500;margin-top:2px;}
+.risk-pill{display:inline-flex;align-items:center;gap:5px;padding:4px 11px;border-radius:20px;font-size:11px;font-weight:700;white-space:nowrap;}
+.risk-pill::before{content:'';width:7px;height:7px;border-radius:50%;background:currentColor;}
+.rp-Kritikal{background:var(--red-bg);color:#b91c1c;} .rp-Tinggi{background:#ffedd5;color:#c2410c;}
+.rp-Sederhana{background:var(--amber-bg);color:var(--amber);} .rp-Rendah{background:var(--green-bg);color:var(--green);}
+.rc-stats{display:flex;gap:18px;padding:0 18px 12px;align-items:center;}
+.rc-stat .n{font-size:22px;font-weight:700;font-family:var(--mono);line-height:1;}
+.rc-stat .l{font-size:10.5px;color:var(--ink-2);margin-top:2px;}
+.sevdots{display:flex;gap:5px;flex-wrap:wrap;}
+.sevdot{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;font-family:var(--mono);padding:2px 7px;border-radius:6px;}
+.sd-r{background:var(--green-bg);color:var(--green);} .sd-s{background:var(--amber-bg);color:var(--amber);} .sd-b{background:var(--red-bg);color:var(--red);}
+.rc-rec{background:var(--surface-2);border-top:1px solid var(--line-2);padding:11px 18px;font-size:12px;color:var(--ink-2);display:flex;gap:8px;align-items:flex-start;}
+.rc-rec .ic{width:15px;height:15px;color:var(--brand);flex-shrink:0;margin-top:2px;}
+.rc-rec b{color:var(--ink);}
+.timeline{position:relative;padding-left:22px;margin-top:8px;}
+.timeline::before{content:'';position:absolute;left:6px;top:4px;bottom:4px;width:2px;background:var(--line);}
+.tl-item{position:relative;padding:9px 0;}
+.tl-item::before{content:'';position:absolute;left:-19px;top:14px;width:10px;height:10px;border-radius:50%;background:var(--surface);border:2px solid var(--brand-2);}
+.tl-date{font-size:11px;color:var(--ink-3);font-family:var(--mono);}
+.tl-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:3px;}
+
 /* ===== print ===== */
 @media print{
   .sidebar,.topbar,.menu-toggle,.no-print{display:none!important;}
@@ -301,6 +330,7 @@ tbody tr:hover{background:var(--surface-2);}
       <div class="nav-label">Menu Utama</div>
       <button class="nav-item active" data-view="dashboard"><svg class="ic"><use href="#i-dashboard"/></svg> Papan Pemuka</button>
       <button class="nav-item" data-view="records"><svg class="ic"><use href="#i-records"/></svg> Rekod Kes</button>
+      <button class="nav-item" data-view="risiko"><svg class="ic"><use href="#i-alert"/></svg> Murid Berisiko</button>
       <button class="nav-item" data-view="guide"><svg class="ic"><use href="#i-scale"/></svg> Panduan Tindakan</button>
       <button class="nav-item" data-view="report"><svg class="ic"><use href="#i-report"/></svg> Laporan</button>
       <div class="nav-label">Sistem</div>
@@ -398,6 +428,27 @@ tbody tr:hover{background:var(--surface-2);}
           </table></div>
           <div id="records-empty"></div>
         </div>
+      </section>
+
+      <!-- ============ RISIKO ============ -->
+      <section class="view" id="view-risiko">
+        <div class="print-head"><h1 id="rk-print-h"></h1><p>SENARAI MURID BERISIKO — Keutamaan Intervensi Disiplin</p></div>
+        <div class="kpi-grid">
+          <div class="kpi"><div class="kpi-top"><div class="kpi-chip chip-amber"><svg class="ic"><use href="#i-users"/></svg></div></div><div class="num" id="rk-k-murid">0</div><div class="lbl">Murid Berulang (≥2 kes)</div></div>
+          <div class="kpi"><div class="kpi-top"><div class="kpi-chip chip-red"><svg class="ic"><use href="#i-alert"/></svg></div></div><div class="num" id="rk-k-tinggi">0</div><div class="lbl">Berisiko Tinggi / Kritikal</div></div>
+          <div class="kpi"><div class="kpi-top"><div class="kpi-chip chip-blue"><svg class="ic"><use href="#i-folder"/></svg></div></div><div class="num" id="rk-k-kes">0</div><div class="lbl">Jumlah Kes Berulang</div></div>
+          <div class="kpi"><div class="kpi-top"><div class="kpi-chip chip-green"><svg class="ic"><use href="#i-chart"/></svg></div></div><div class="num" id="rk-k-purata">0</div><div class="lbl">Purata Kes / Murid</div></div>
+        </div>
+        <div class="card no-print">
+          <div class="filterbar">
+            <div class="search-wrap"><svg class="ic"><use href="#i-search"/></svg><input id="rk-search" placeholder="Cari nama murid / kelas..." oninput="renderRisiko()"></div>
+            <select id="rk-level" onchange="renderRisiko()"><option value="">Semua Tahap Risiko</option><option>Kritikal</option><option>Tinggi</option><option>Sederhana</option><option>Rendah</option></select>
+            <select id="rk-sort" onchange="renderRisiko()"><option value="risk">Susun: Tahap Risiko</option><option value="count">Susun: Jumlah Kes</option><option value="recent">Susun: Terkini</option><option value="nama">Susun: Nama</option></select>
+            <button class="btn" onclick="window.print()"><svg class="ic"><use href="#i-printer"/></svg> Cetak</button>
+          </div>
+        </div>
+        <div id="risiko-grid" class="risk-grid"></div>
+        <div id="risiko-empty"></div>
       </section>
 
       <!-- ============ GUIDE ============ -->
@@ -532,6 +583,14 @@ tbody tr:hover{background:var(--surface-2);}
   </div>
 </div>
 
+<!-- ===== RISK DETAIL MODAL ===== -->
+<div class="overlay" id="riskOverlay">
+  <div class="modal" style="max-width:720px">
+    <div class="modal-h"><h3 id="rkTitle">Profil Murid</h3><button class="close-x" onclick="document.getElementById('riskOverlay').classList.remove('show')"><svg class="ic"><use href="#i-x"/></svg></button></div>
+    <div class="modal-b" id="rkBody"></div>
+  </div>
+</div>
+
 <!-- ===== LIGHTBOX ===== -->
 <div class="overlay lightbox" id="lightbox" onclick="this.classList.remove('show')">
   <img id="lightboxImg" alt="Foto bukti penuh">
@@ -659,7 +718,7 @@ function emptyMini(){return `<div class="empty">${ico('inbox')}<p>Tiada data</p>
 function fotoCell(c){return c.foto?`<img class="thumb" src="${esc(c.foto)}" onclick="showLightbox(this.src)" loading="lazy" alt="Foto bukti kes ${esc(c.nama)}">`:`<span class="no-thumb" title="Tiada foto">${ico('image')}</span>`;}
 
 /* ====================== NAV ====================== */
-const TITLES={dashboard:['Papan Pemuka','Ringkasan keseluruhan pengurusan disiplin'],records:['Rekod Kes','Senarai & pengurusan semua kes disiplin'],guide:['Panduan Tindakan','Cadangan tindakan mengikut peraturan sekolah'],report:['Laporan','Jana & cetak laporan disiplin'],settings:['Tetapan & Data','Konfigurasi sistem dan sandaran data']};
+const TITLES={dashboard:['Papan Pemuka','Ringkasan keseluruhan pengurusan disiplin'],records:['Rekod Kes','Senarai & pengurusan semua kes disiplin'],risiko:['Murid Berisiko','Murid berulang kes — keutamaan intervensi'],guide:['Panduan Tindakan','Cadangan tindakan mengikut peraturan sekolah'],report:['Laporan','Jana & cetak laporan disiplin'],settings:['Tetapan & Data','Konfigurasi sistem dan sandaran data']};
 function go(v){
   document.querySelectorAll('.nav-item').forEach(b=>b.classList.toggle('active',b.dataset.view===v));
   document.querySelectorAll('.view').forEach(s=>s.classList.toggle('active',s.id==='view-'+v));
@@ -668,6 +727,7 @@ function go(v){
   document.getElementById('sidebar').classList.remove('open');
   if(v==='dashboard')renderDashboard();
   if(v==='records')renderRecords();
+  if(v==='risiko')renderRisiko();
   if(v==='report')buildReport();
   window.scrollTo(0,0);
 }
@@ -765,6 +825,92 @@ function renderRecords(){
 }
 function resetFilters(){['f-search','f-kategori','f-tahap','f-status'].forEach(i=>document.getElementById(i).value='');renderRecords();}
 
+/* ====================== RISIKO (murid berulang) ====================== */
+const SEVW={Ringan:1,Sederhana:2,Berat:3};
+const LVLRANK={Kritikal:4,Tinggi:3,Sederhana:2,Rendah:1};
+const RISK_REC={
+  Rendah:'Pemantauan oleh guru kelas & nasihat berterusan. Rekod dalam buku disiplin.',
+  Sederhana:'Kaunseling individu + makluman ibu bapa. Pantau tingkah laku secara berkala.',
+  Tinggi:'Panggil ibu bapa berjumpa, kaunseling berstruktur & surat amaran. Pemantauan rapi.',
+  Kritikal:'Bawa ke Lembaga Disiplin Sekolah. Pelan intervensi individu, rujuk kaunselor / PPD; pertimbang waad atau penggantungan.'
+};
+function riskLevel(score,bBerat){
+  if(bBerat>=2||score>=9)return 'Kritikal';
+  if(score>=6||(bBerat>=1&&score>=4))return 'Tinggi';
+  if(score>=4)return 'Sederhana';
+  return 'Rendah';
+}
+function riskProfiles(){
+  const g={};
+  CASES.forEach(c=>{const key=(c.nama||'').trim()+'|'+c.kelas;(g[key]=g[key]||[]).push(c);});
+  const out=[];
+  Object.values(g).forEach(cs=>{
+    if(cs.length<2)return;
+    const sev={Ringan:0,Sederhana:0,Berat:0};let score=0;
+    cs.forEach(c=>{sev[c.tahap]=(sev[c.tahap]||0)+1;score+=SEVW[c.tahap]||1;});
+    const sorted=[...cs].sort((a,b)=>(b.tarikh||'').localeCompare(a.tarikh||''));
+    const catCount={};cs.forEach(c=>catCount[c.kategori]=(catCount[c.kategori]||0)+1);
+    const topCats=Object.entries(catCount).sort((a,b)=>b[1]-a[1]).map(([id])=>id);
+    out.push({nama:sorted[0].nama,kelas:sorted[0].kelas,cases:sorted,count:cs.length,sev,score,level:riskLevel(score,sev.Berat),last:sorted[0].tarikh,topCats});
+  });
+  return out;
+}
+let RISK_VIEW=[];
+function renderRisiko(){
+  const all=riskProfiles();
+  document.getElementById('rk-k-murid').textContent=all.length;
+  document.getElementById('rk-k-tinggi').textContent=all.filter(p=>p.level==='Tinggi'||p.level==='Kritikal').length;
+  const totKes=all.reduce((s,p)=>s+p.count,0);
+  document.getElementById('rk-k-kes').textContent=totKes;
+  document.getElementById('rk-k-purata').textContent=all.length?(totKes/all.length).toFixed(1):'0';
+  document.getElementById('rk-print-h').textContent=SETTINGS.nama+' ('+SETTINGS.kod+')';
+  const q=(document.getElementById('rk-search').value||'').toLowerCase();
+  const lvl=document.getElementById('rk-level').value, sort=document.getElementById('rk-sort').value;
+  let list=all.filter(p=>(!lvl||p.level===lvl)&&(!q||(p.nama+p.kelas).toLowerCase().includes(q)));
+  list.sort((a,b)=>{
+    if(sort==='count')return b.count-a.count||b.score-a.score;
+    if(sort==='recent')return (b.last||'').localeCompare(a.last||'');
+    if(sort==='nama')return a.nama.localeCompare(b.nama);
+    return (LVLRANK[b.level]-LVLRANK[a.level])||(b.score-a.score);
+  });
+  RISK_VIEW=list;
+  const grid=document.getElementById('risiko-grid'),emp=document.getElementById('risiko-empty');
+  if(!all.length){grid.innerHTML='';emp.innerHTML=`<div class="empty">${ico('check')}<p>Tiada murid berulang kes setakat ini. Syabas!</p></div>`;return;}
+  if(!list.length){grid.innerHTML='';emp.innerHTML=`<div class="empty">${ico('search')}<p>Tiada murid sepadan dengan penapis.</p></div>`;return;}
+  emp.innerHTML='';
+  grid.innerHTML=list.map((p,idx)=>{
+    const dots=[['r','Ringan',p.sev.Ringan],['s','Sederhana',p.sev.Sederhana],['b','Berat',p.sev.Berat]].filter(d=>d[2]>0)
+      .map(([c,nm,n])=>`<span class="sevdot sd-${c}" title="${nm}">${n} ${nm}</span>`).join('');
+    const cats=p.topCats.slice(0,3).map(id=>katBadge(id)).join(' ');
+    return `<div class="risk-card lvl-${p.level}" onclick="showRiskDetail(${idx})">
+      <div class="rc-top"><div class="rc-name">${esc(p.nama)}<span>${esc(p.kelas)}</span></div><span class="risk-pill rp-${p.level}">${p.level}</span></div>
+      <div class="rc-stats">
+        <div class="rc-stat"><div class="n">${p.count}</div><div class="l">Jumlah Kes</div></div>
+        <div style="display:flex;flex-direction:column;gap:7px;min-width:0">
+          <div class="sevdots">${dots}</div>
+          <div style="display:flex;gap:5px;align-items:center;flex-wrap:wrap">${cats}<span style="font-size:11px;color:var(--ink-3)">· terakhir ${fmtDate(p.last)}</span></div>
+        </div>
+      </div>
+      <div class="rc-rec">${ico('scale')}<span><b>Cadangan:</b> ${esc(RISK_REC[p.level])}</span></div>
+    </div>`;
+  }).join('');
+}
+function showRiskDetail(idx){
+  const p=RISK_VIEW[idx];if(!p)return;
+  document.getElementById('rkTitle').innerHTML=`<svg class="ic"><use href="#i-users"/></svg> ${esc(p.nama)} — ${esc(p.kelas)}`;
+  const tl=p.cases.map(c=>`<div class="tl-item"><div class="tl-date">${fmtDate(c.tarikh)} · ${statusPill(c.status)}</div><div class="tl-row">${katCell(c.kategori)} ${sevPill(c.tahap)} ${c.foto?`<img class="thumb" style="width:30px;height:30px" src="${esc(c.foto)}" onclick="event.stopPropagation();showLightbox(this.src)" alt="bukti">`:''}</div>${c.butiran?`<div style="font-size:12px;color:var(--ink-2);margin-top:4px">${esc(c.butiran)}</div>`:''}</div>`).join('');
+  document.getElementById('rkBody').innerHTML=`
+    <div style="display:flex;gap:9px;align-items:center;margin-bottom:14px;flex-wrap:wrap">
+      <span class="risk-pill rp-${p.level}">Risiko ${p.level}</span>
+      <span class="tag">${p.count} kes</span><span class="tag">Skor keseriusan: ${p.score}</span>
+    </div>
+    <div class="notebox danger" style="margin-top:0">${ico('scale')}<span><b>Cadangan Intervensi (${p.level}):</b> ${esc(RISK_REC[p.level])}</span></div>
+    <h4 style="margin:18px 0 4px;font-size:13px;font-weight:700">Sejarah Kes</h4>
+    <div class="timeline">${tl}</div>
+    <div class="notebox info" style="font-size:11px;margin-top:14px">${ico('info')}<span>${REGULASI}</span></div>`;
+  document.getElementById('riskOverlay').classList.add('show');
+}
+
 /* ====================== CASE MODAL ====================== */
 function openCaseModal(id){
   document.getElementById('caseOverlay').classList.add('show');
@@ -824,13 +970,13 @@ async function saveCase(){
     else{obj.dicipta=new Date().toISOString();CASES.push(obj);}
     save();toast(id?'Kes dikemaskini':'Kes baharu direkodkan');
   }
-  closeCaseModal();renderRecords();renderDashboard();
+  closeCaseModal();renderRecords();renderDashboard();renderRisiko();
 }
 async function delCase(id){
   const c=CASES.find(x=>String(x.id)===String(id));
   if(!confirm('Padam kes '+(c?c.nama:'')+'? Tindakan ini tidak boleh dibatalkan.'))return;
   if(CLOUD()){try{const res=await apiPost({action:'delete',id});if(!res.ok)throw new Error(res.error);}catch(e){toast('Gagal padam di awan: '+e.message);return;}}
-  CASES=CASES.filter(x=>String(x.id)!==String(id));save();renderRecords();renderDashboard();toast('Kes dipadam');
+  CASES=CASES.filter(x=>String(x.id)!==String(id));save();renderRecords();renderDashboard();renderRisiko();toast('Kes dipadam');
 }
 
 /* ====================== GUIDE ====================== */
@@ -961,7 +1107,7 @@ function initAll(){
 document.getElementById('c-tahap').addEventListener('change',showCadangan);
 document.getElementById('c-nama').addEventListener('input',showCadangan);
 document.getElementById('c-kelas').addEventListener('input',showCadangan);
-['caseOverlay','guideOverlay'].forEach(id=>document.getElementById(id).addEventListener('click',e=>{if(e.target.id===id)e.currentTarget.classList.remove('show');}));
+['caseOverlay','guideOverlay','riskOverlay'].forEach(id=>document.getElementById(id).addEventListener('click',e=>{if(e.target.id===id)e.currentTarget.classList.remove('show');}));
 document.addEventListener('keydown',e=>{if(e.key==='Escape')document.querySelectorAll('.overlay.show').forEach(o=>o.classList.remove('show'));});
 initAll();
 </script>
