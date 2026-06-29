@@ -545,7 +545,10 @@ tbody tr:hover{background:var(--surface-2);}
       <input type="hidden" id="c-id">
       <div class="form-grid">
         <div class="field"><label>Kelas <span class="req">*</span></label><input id="c-kelas" list="kelasList" placeholder="Pilih kelas…" autocomplete="off"><datalist id="kelasList"></datalist></div>
-        <div class="field"><label>Nama Murid <span class="req">*</span></label><input id="c-nama" list="namaList" placeholder="Pilih kelas dahulu…" autocomplete="off"><datalist id="namaList"></datalist><div class="hint" id="c-nama-hint"></div></div>
+        <div class="field"><label>Nama Murid <span class="req">*</span></label>
+          <select id="c-nama-sel" style="display:none" onchange="onNamaSel()"></select>
+          <input id="c-nama" list="namaList" placeholder="Pilih kelas dahulu…" autocomplete="off"><datalist id="namaList"></datalist>
+          <div class="hint" id="c-nama-hint"></div></div>
         <div class="field"><label>Jantina</label><select id="c-jantina"><option>Lelaki</option><option>Perempuan</option></select></div>
         <div class="field"><label>Tarikh Kejadian <span class="req">*</span></label><input type="date" id="c-tarikh"></div>
         <div class="field"><label>Kategori Salah Laku <span class="req">*</span></label><select id="c-kategori" onchange="onKategoriPick()"></select></div>
@@ -695,15 +698,31 @@ function applyRoster(){
 }
 function onKelasPick(){
   const kelas=document.getElementById('c-kelas').value.trim();
-  const hint=document.getElementById('c-nama-hint'), nameInput=document.getElementById('c-nama');
-  if(ROSTER.length){
+  const hint=document.getElementById('c-nama-hint'), nameInput=document.getElementById('c-nama'), sel=document.getElementById('c-nama-sel');
+  if(ROSTER.length && kelas){
     const studs=ROSTER.filter(s=>s.kelas.toLowerCase()===kelas.toLowerCase());
-    document.getElementById('namaList').innerHTML=studs.map(s=>`<option value="${esc(s.nama)}"></option>`).join('');
-    if(!kelas){nameInput.placeholder='Pilih kelas dahulu…';if(hint)hint.textContent='';}
-    else if(studs.length){nameInput.placeholder='Taip / pilih nama murid…';if(hint)hint.innerHTML=`<svg class="ic" style="width:13px;height:13px;color:var(--green)"><use href="#i-users"/></svg> ${studs.length} murid dalam kelas <b>${esc(kelas)}</b>`;}
-    else{nameInput.placeholder='Taip nama murid…';if(hint)hint.innerHTML='<span style="color:var(--amber)">Kelas tiada dalam roster — taip nama secara manual</span>';}
+    if(studs.length){
+      const cur=nameInput.value.trim();
+      let opts='<option value="">— Pilih nama murid —</option>';
+      if(cur && !studs.some(s=>s.nama===cur)) opts+=`<option value="${esc(cur)}">${esc(cur)} (luar roster)</option>`;
+      opts+=studs.map(s=>`<option value="${esc(s.nama)}">${esc(s.nama)}</option>`).join('');
+      opts+='<option value="__manual__">＋ Taip nama lain…</option>';
+      sel.innerHTML=opts; sel.value=cur||''; nameInput.value=sel.value;
+      sel.style.display=''; nameInput.style.display='none';
+      if(hint)hint.innerHTML=`<svg class="ic" style="width:13px;height:13px;color:var(--green)"><use href="#i-users"/></svg> ${studs.length} murid dalam kelas <b>${esc(kelas)}</b>`;
+      showCadangan(); return;
+    }
   }
+  // fallback: taip manual (luar talian, atau kelas tiada dalam roster)
+  sel.style.display='none'; nameInput.style.display='';
+  nameInput.placeholder = !ROSTER.length ? 'Nama penuh murid' : (kelas?'Taip nama murid…':'Pilih kelas dahulu…');
+  if(hint)hint.innerHTML = (ROSTER.length && kelas) ? '<span style="color:var(--amber)">Kelas tiada dalam roster — taip nama secara manual</span>' : '';
   showCadangan();
+}
+function onNamaSel(){
+  const sel=document.getElementById('c-nama-sel'), nameInput=document.getElementById('c-nama');
+  if(sel.value==='__manual__'){sel.style.display='none';nameInput.style.display='';nameInput.value='';nameInput.placeholder='Taip nama murid…';nameInput.focus();showCadangan();return;}
+  nameInput.value=sel.value; showCadangan();
 }
 
 /* ---------- Foto: mampatan & lightbox ---------- */
