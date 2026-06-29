@@ -843,10 +843,11 @@ function renderDashboard(){
     : `<tr><td colspan="6"><div class="empty">${ico('inbox')}<p>Tiada rekod kes lagi. Klik "Rekod Kes Baharu" untuk bermula.</p></div></td></tr>`;
 }
 function donut(parts,tot){
-  let off=0,seg='';const r=15.9155,C=2*Math.PI*r;
-  parts.forEach(([nm,v,col])=>{const len=(v/tot)*C;seg+=`<circle r="${r}" cx="18" cy="18" fill="transparent" stroke="${col}" stroke-width="5.2" stroke-dasharray="${len} ${C-len}" stroke-dashoffset="${-off}" transform="rotate(-90 18 18)" stroke-linecap="butt"/>`;off+=len;});
+  const cx=18,cy=18,r=14.5,sw=4.6,C=2*Math.PI*r;   // outer edge 16.8 < 18 → tiada lagi terpotong
+  let off=0,seg='';
+  parts.forEach(([nm,v,col])=>{if(v<=0)return;const len=(v/tot)*C;seg+=`<circle r="${r}" cx="${cx}" cy="${cy}" fill="none" stroke="${col}" stroke-width="${sw}" stroke-dasharray="${len} ${C-len}" stroke-dashoffset="${-off}" transform="rotate(-90 ${cx} ${cy})"/>`;off+=len;});
   const leg=parts.map(([nm,v,col])=>`<div class="legrow"><span class="legdot" style="background:${col}"></span>${nm} <b>${v} <span style="color:var(--ink-3);font-weight:500">(${pct(v,tot)}%)</span></b></div>`).join('');
-  return `<svg width="124" height="124" viewBox="0 0 36 36">${seg}<circle r="12.2" cx="18" cy="18" fill="var(--surface)"/><text class="mono" x="18" y="17.5" text-anchor="middle" font-size="7" font-weight="700" fill="var(--ink)">${tot}</text><text x="18" y="23" text-anchor="middle" font-size="2.8" fill="var(--ink-3)" letter-spacing=".3">KES</text></svg><div class="legend">${leg}</div>`;
+  return `<svg width="124" height="124" viewBox="0 0 36 36"><circle r="${r}" cx="${cx}" cy="${cy}" fill="none" stroke="var(--line-2)" stroke-width="${sw}"/>${seg}<text class="mono" x="18" y="17.6" text-anchor="middle" font-size="7" font-weight="700" fill="var(--ink)">${tot}</text><text x="18" y="22.6" text-anchor="middle" font-size="2.8" fill="var(--ink-3)" letter-spacing=".3">KES</text></svg><div class="legend">${leg}</div>`;
 }
 function lineChart(data){
   const W=520,H=170,pad={l:26,r:14,t:14,b:24};
