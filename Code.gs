@@ -64,6 +64,7 @@ function doGet(e){
   if (action === 'ping') return json_({ ok:true, msg:'Sistem Disiplin GAS aktif', pin: !!PIN, roster: !!ROSTER_ID });
   if (action === 'list') return json_({ ok:true, data: listKes_() });
   if (action === 'students') return json_({ ok:true, data: listStudents_() });
+  if (action === 'info') return json_({ ok:true, sheetUrl: sheet_().getParent().getUrl(), folderUrl: folder_().getUrl() });
   return json_({ ok:false, error:'Tindakan tidak dikenali' });
 }
 

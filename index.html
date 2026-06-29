@@ -518,6 +518,10 @@ tbody tr:hover{background:var(--surface-2);}
             <button class="btn" onclick="testConnection()"><svg class="ic"><use href="#i-cloud"/></svg> Uji Sambungan</button>
           </div>
           <div class="notebox info" id="rosterInfo" style="margin-top:14px"><svg class="ic"><use href="#i-users"/></svg><span>Roster murid Hadir@SKBT akan dimuatkan automatik selepas sambung — nama &amp; kelas dalam borang kes diisi terus dari senarai terkini.</span></div>
+          <div id="cloudLinks" style="display:none;gap:10px;flex-wrap:wrap;margin-top:12px">
+            <button class="btn" onclick="openCloud('sheet')"><svg class="ic"><use href="#i-db"/></svg> Buka Google Sheet (Kes)</button>
+            <button class="btn" onclick="openCloud('folder')"><svg class="ic"><use href="#i-image"/></svg> Buka Folder Foto</button>
+          </div>
         </div>
         <div class="card">
           <div class="card-h"><h3><svg class="ic"><use href="#i-db"/></svg> Sandaran &amp; Pemulihan Data</h3></div>
@@ -670,6 +674,7 @@ function setMode(state){
   const map={offline:['Luar Talian',''],cloud:['Awan · Tersambung','cloud'],loading:['Menyambung…','loading'],error:['Awan · Ralat','error']};
   const [txt,cls]=map[state]||map.offline;
   ['modeBadge','modeBadge2'].forEach(id=>{const el=document.getElementById(id);if(el){el.textContent=txt;el.className='mode-badge'+(cls?' '+cls:'');}});
+  const cl=document.getElementById('cloudLinks');if(cl)cl.style.display=(state==='cloud')?'flex':'none';
 }
 function upsert(rec){const i=CASES.findIndex(x=>String(x.id)===String(rec.id));if(i>-1)CASES[i]={...CASES[i],...rec};else CASES.push(rec);}
 async function cloudLoad(){
@@ -718,6 +723,14 @@ function onKelasPick(){
   nameInput.placeholder = !ROSTER.length ? 'Nama penuh murid' : (kelas?'Taip nama murid…':'Pilih kelas dahulu…');
   if(hint)hint.innerHTML = (ROSTER.length && kelas) ? '<span style="color:var(--amber)">Kelas tiada dalam roster — taip nama secara manual</span>' : '';
   showCadangan();
+}
+let CLOUD_INFO=null;
+async function openCloud(which){
+  try{
+    if(!CLOUD_INFO){const res=await apiGet('action=info');if(!res.ok)throw 0;CLOUD_INFO=res;}
+    const u=which==='sheet'?CLOUD_INFO.sheetUrl:CLOUD_INFO.folderUrl;
+    if(u)window.open(u,'_blank');else toast('Pautan tidak tersedia');
+  }catch(e){toast('Kemas kini Code.gs & deploy versi baharu untuk guna butang ini');}
 }
 function onNamaSel(){
   const sel=document.getElementById('c-nama-sel'), nameInput=document.getElementById('c-nama');
