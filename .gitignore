@@ -1,0 +1,10 @@
+# OS / editor
+Thumbs.db
+desktop.ini
+.DS_Store
+.vs/
+.vscode/
+
+# scratch / temp
+*.tmp
+*.log

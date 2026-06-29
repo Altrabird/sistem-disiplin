@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rumusan Pengurusan Disiplin SK Bandar Tawau 2026</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&display=swap');
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Poppins',sans-serif;background:#0a0a2e;overflow:hidden;}
+.slide{display:none;width:100vw;height:100vh;position:relative;overflow:hidden;}
+.slide.active{display:flex;}
+.nav-btn{position:fixed;top:50%;transform:translateY(-50%);background:rgba(255,255,255,0.15);border:2px solid rgba(255,255,255,0.4);color:#fff;width:50px;height:50px;border-radius:50%;font-size:22px;cursor:pointer;z-index:1000;transition:all 0.3s;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(5px);}
+.nav-btn:hover{background:rgba(255,255,255,0.3);transform:translateY(-50%) scale(1.1);}
+#prevBtn{left:15px;}
+#nextBtn{right:15px;}
+.slide-counter{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);display:flex;gap:10px;z-index:1000;}
+.dot{width:12px;height:12px;border-radius:50%;background:rgba(255,255,255,0.3);cursor:pointer;transition:all 0.3s;border:2px solid rgba(255,255,255,0.5);}
+.dot.active{background:#fff;transform:scale(1.3);}
+.slide-num{position:fixed;top:16px;right:80px;color:rgba(255,255,255,0.5);font-size:12px;z-index:1000;font-family:'Poppins',sans-serif;}
+
+/* ====== SLIDE 1 ====== */
+#slide1{background:linear-gradient(135deg,#0d1b6e 0%,#1a237e 40%,#0a3d6b 70%,#01579b 100%);flex-direction:column;align-items:center;justify-content:center;}
+.s1-badge{background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.3);border-radius:30px;padding:8px 24px;color:#90caf9;font-size:13px;letter-spacing:3px;text-transform:uppercase;margin-bottom:20px;backdrop-filter:blur(10px);}
+.s1-logo{width:90px;height:90px;background:linear-gradient(135deg,#1565c0,#0288d1);border-radius:50%;display:flex;align-items:center;justify-content:center;margin-bottom:24px;font-size:40px;box-shadow:0 0 40px rgba(2,136,209,0.6);animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{box-shadow:0 0 30px rgba(2,136,209,0.5)}50%{box-shadow:0 0 60px rgba(2,136,209,0.9)}}
+.s1-title{font-size:40px;font-weight:800;color:#fff;text-align:center;line-height:1.2;text-shadow:0 4px 20px rgba(0,0,0,0.5);margin-bottom:10px;}
+.s1-title span{color:#29b6f6;}
+.s1-sub{font-size:17px;color:#90caf9;margin-bottom:28px;text-align:center;}
+.s1-divider{width:80px;height:4px;background:linear-gradient(90deg,#29b6f6,#e1f5fe);border-radius:2px;margin:0 auto 28px;}
+.s1-cards{display:flex;gap:18px;margin-bottom:28px;flex-wrap:wrap;justify-content:center;}
+.s1-card{background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);border-radius:16px;padding:14px 22px;text-align:center;backdrop-filter:blur(10px);min-width:130px;}
+.s1-card .num{font-size:26px;font-weight:800;color:#29b6f6;}
+.s1-card .lbl{font-size:10px;color:#b3e5fc;text-transform:uppercase;letter-spacing:1px;}
+.s1-info{display:flex;gap:28px;flex-wrap:wrap;justify-content:center;}
+.s1-info-item{display:flex;align-items:center;gap:8px;color:#90caf9;font-size:13px;}
+.s1-watermark{position:absolute;bottom:40px;right:40px;color:rgba(255,255,255,0.3);font-size:11px;text-align:right;}
+.wave{position:absolute;bottom:0;left:0;width:200%;opacity:0.08;animation:wave 10s linear infinite;}
+@keyframes wave{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+
+/* ====== SLIDE 2 ====== */
+#slide2{background:linear-gradient(135deg,#1b2838 0%,#0d3b2e 50%,#1a3a1a 100%);flex-direction:column;align-items:center;justify-content:flex-start;padding:35px 60px;}
+.s2-header{text-align:center;margin-bottom:26px;}
+.s2-header h2{font-size:28px;font-weight:800;color:#fff;}
+.s2-header h2 span{color:#4caf50;}
+.s2-header p{color:#81c784;font-size:12px;margin-top:4px;}
+.s2-grid{display:grid;grid-template-columns:1fr 1fr;gap:22px;width:100%;max-width:1180px;}
+.stat-card{background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);border-radius:18px;padding:22px;backdrop-filter:blur(10px);}
+.stat-card h3{font-size:13px;color:#a5d6a7;text-transform:uppercase;letter-spacing:1px;margin-bottom:16px;display:flex;align-items:center;gap:8px;}
+.big-stat{display:flex;align-items:flex-end;gap:14px;margin-bottom:18px;}
+.big-num{font-size:66px;font-weight:800;color:#fff;line-height:1;}
+.big-label{font-size:12px;color:#81c784;padding-bottom:10px;}
+.gender-bar{margin-bottom:12px;}
+.gender-label{display:flex;justify-content:space-between;margin-bottom:5px;font-size:12px;}
+.gender-label .name{color:#e0e0e0;display:flex;align-items:center;gap:6px;}
+.gender-label .val{color:#fff;font-weight:700;}
+.bar-track{height:11px;background:rgba(255,255,255,0.1);border-radius:6px;overflow:hidden;}
+.bar-fill{height:100%;border-radius:6px;}
+.bar-lelaki{background:linear-gradient(90deg,#1565c0,#42a5f5);}
+.bar-perempuan{background:linear-gradient(90deg,#880e4f,#e91e8c);}
+.bar-bukan{background:linear-gradient(90deg,#e65100,#ff9800);}
+.pie-wrap{display:flex;align-items:center;gap:18px;}
+.pie-legend{display:flex;flex-direction:column;gap:9px;}
+.legend-item{display:flex;align-items:center;gap:10px;font-size:12px;color:#e0e0e0;}
+.legend-dot{width:13px;height:13px;border-radius:50%;flex-shrink:0;}
+.agama-wrap{display:flex;gap:8px;height:58px;border-radius:12px;overflow:hidden;margin-top:8px;}
+.agama-islam{background:linear-gradient(180deg,#00695c,#00897b);display:flex;align-items:center;justify-content:center;flex-direction:column;color:#fff;font-size:11px;border-radius:12px 0 0 12px;flex:64;}
+.agama-bukan{background:linear-gradient(180deg,#4527a0,#7b1fa2);display:flex;align-items:center;justify-content:center;flex-direction:column;color:#fff;font-size:11px;border-radius:0 12px 12px 0;flex:36;}
+.agama-num{font-size:21px;font-weight:800;}
+.kelas-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:5px;}
+.kelas-chip{background:rgba(76,175,80,0.2);border:1px solid rgba(76,175,80,0.3);border-radius:7px;padding:5px 3px;text-align:center;font-size:9px;color:#a5d6a7;font-weight:600;}
+.kelas-chip.pra{background:rgba(255,152,0,0.2);border-color:rgba(255,152,0,0.3);color:#ffcc02;}
+
+/* ====== SLIDE 3 ====== */
+#slide3{background:linear-gradient(135deg,#1a0a2e 0%,#2d1b5e 50%,#1a0a3e 100%);flex-direction:column;align-items:center;justify-content:flex-start;padding:28px 46px;}
+.s3-header{text-align:center;margin-bottom:20px;}
+.s3-header h2{font-size:26px;font-weight:800;color:#fff;}
+.s3-header h2 span{color:#ce93d8;}
+.s3-header p{color:#ce93d8;font-size:11px;margin-top:4px;}
+.cat-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;width:100%;max-width:1180px;}
+.cat-card{background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);border-radius:13px;padding:12px 8px;text-align:center;transition:all 0.3s;backdrop-filter:blur(5px);display:flex;flex-direction:column;align-items:center;gap:6px;}
+.cat-card:hover{background:rgba(255,255,255,0.15);transform:translateY(-4px);}
+.cat-icon{font-size:24px;}
+.cat-num{font-size:10px;font-weight:700;color:#9575cd;background:rgba(149,117,205,0.2);border-radius:10px;padding:2px 7px;}
+.cat-name{font-size:9.5px;color:#e1bee7;font-weight:600;line-height:1.3;}
+.s3-note{margin-top:14px;background:rgba(206,147,216,0.1);border:1px solid rgba(206,147,216,0.3);border-radius:11px;padding:10px 22px;color:#ce93d8;font-size:11px;text-align:center;}
+
+/* ====== SLIDE 4 ====== */
+#slide4{background:linear-gradient(135deg,#0d1f3c 0%,#0a2d5c 50%,#071a3e 100%);flex-direction:column;align-items:center;justify-content:flex-start;padding:32px 60px;}
+.s4-header{text-align:center;margin-bottom:24px;}
+.s4-header h2{font-size:27px;font-weight:800;color:#fff;}
+.s4-header h2 span{color:#64b5f6;}
+.s4-header p{color:#90caf9;font-size:12px;margin-top:4px;}
+.stat2026-wrap{display:grid;grid-template-columns:1fr 1fr;gap:24px;width:100%;max-width:1180px;}
+.stat2026-card{background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);border-radius:18px;padding:24px;backdrop-filter:blur(10px);}
+.stat2026-card h3{font-size:13px;color:#90caf9;text-transform:uppercase;letter-spacing:1px;margin-bottom:18px;display:flex;align-items:center;gap:8px;}
+.kes-summary{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:16px;}
+.kes-box{text-align:center;padding:14px 10px;border-radius:12px;}
+.kes-box.total{background:rgba(33,150,243,0.15);border:1px solid rgba(33,150,243,0.3);}
+.kes-box.murid{background:rgba(76,175,80,0.15);border:1px solid rgba(76,175,80,0.3);}
+.kes-box.pending{background:rgba(255,152,0,0.15);border:1px solid rgba(255,152,0,0.3);}
+.kes-box .knum{font-size:38px;font-weight:800;color:#fff;line-height:1;}
+.kes-box .klbl{font-size:10px;margin-top:4px;text-transform:uppercase;letter-spacing:1px;}
+.kes-box.total .klbl{color:#64b5f6;}
+.kes-box.murid .klbl{color:#81c784;}
+.kes-box.pending .klbl{color:#ffb74d;}
+.status-row{display:flex;gap:10px;margin-bottom:14px;}
+.status-pill{flex:1;text-align:center;padding:12px 8px;border-radius:10px;}
+.pill-lapor{background:rgba(33,150,243,0.2);border:1px solid rgba(33,150,243,0.4);}
+.pill-cadang{background:rgba(255,193,7,0.2);border:1px solid rgba(255,193,7,0.4);}
+.pill-selesai{background:rgba(76,175,80,0.2);border:1px solid rgba(76,175,80,0.4);}
+.pill-num{font-size:30px;font-weight:800;color:#fff;display:block;}
+.pill-lbl{font-size:10px;margin-top:3px;font-weight:600;}
+.pill-lapor .pill-lbl{color:#90caf9;}
+.pill-cadang .pill-lbl{color:#ffe082;}
+.pill-selesai .pill-lbl{color:#a5d6a7;}
+.stat2026-note{padding:10px 16px;background:rgba(255,193,7,0.1);border:1px solid rgba(255,193,7,0.3);border-radius:10px;font-size:11px;color:#ffe082;line-height:1.6;}
+.modul-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;}
+.modul-item{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,0.05);border-left:3px solid rgba(100,181,246,0.5);border-radius:0 8px 8px 0;padding:9px 12px;}
+.modul-icon{font-size:18px;}
+.modul-name{font-size:11px;color:#e0e0e0;font-weight:600;}
+.modul-val{font-size:10px;color:#90caf9;margin-top:1px;}
+.kategori-zero{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-top:10px;}
+.kz-item{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:7px 6px;text-align:center;font-size:9px;color:#78909c;}
+.kz-item span{display:block;font-size:16px;margin-bottom:3px;}
+
+/* ====== SLIDE 5 ====== */
+#slide5{background:linear-gradient(135deg,#1a1200 0%,#3e2900 50%,#1a1a00 100%);flex-direction:column;align-items:center;justify-content:flex-start;padding:28px 56px;}
+.s5-header{text-align:center;margin-bottom:20px;}
+.s5-header h2{font-size:26px;font-weight:800;color:#fff;}
+.s5-header h2 span{color:#ffd54f;}
+.s5-header p{color:#ffe082;font-size:11px;margin-top:4px;}
+.flow-container{display:flex;gap:26px;width:100%;max-width:1180px;align-items:flex-start;}
+.flow-col{flex:1;}
+.flow-title{font-size:12px;font-weight:700;color:#ffd54f;text-transform:uppercase;letter-spacing:2px;margin-bottom:14px;display:flex;align-items:center;gap:8px;}
+.flow-step{display:flex;align-items:flex-start;gap:11px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,213,79,0.2);border-radius:11px;padding:12px 14px;margin-bottom:8px;transition:all 0.3s;}
+.flow-step:hover{background:rgba(255,213,79,0.1);border-color:rgba(255,213,79,0.4);}
+.flow-step-num{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#f57f17,#ffd54f);display:flex;align-items:center;justify-content:center;font-weight:800;color:#1a1200;font-size:13px;flex-shrink:0;margin-top:1px;}
+.flow-step-text{color:#fff;font-size:12px;font-weight:600;}
+.flow-step-sub{color:#ffe082;font-size:10px;margin-top:2px;}
+.flow-arrow{text-align:center;color:#ffd54f;font-size:14px;margin:-3px 0;}
+.hukuman-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;}
+.hukuman-card{background:rgba(255,255,255,0.06);border-radius:11px;padding:11px;display:flex;align-items:center;gap:9px;border-left:3px solid;}
+.h-ringan{border-color:#66bb6a;}
+.h-sederhana{border-color:#ffa726;}
+.h-berat{border-color:#ef5350;}
+.hukuman-icon{font-size:18px;}
+.hukuman-name{font-size:11px;color:#fff;font-weight:600;}
+.hukuman-type{font-size:9px;margin-top:1px;}
+.h-ringan .hukuman-type{color:#66bb6a;}
+.h-sederhana .hukuman-type{color:#ffa726;}
+.h-berat .hukuman-type{color:#ef5350;}
+.kaunsel-grid{display:grid;grid-template-columns:1fr;gap:7px;}
+.kaunsel-item{display:flex;align-items:center;gap:9px;background:rgba(255,255,255,0.05);border-radius:9px;padding:9px 12px;border-left:3px solid rgba(255,213,79,0.5);}
+.kaunsel-icon{font-size:14px;}
+.kaunsel-name{font-size:11px;color:#ffe082;font-weight:600;}
+
+/* ====== SLIDE 6 ====== */
+#slide6{background:linear-gradient(135deg,#0d2518 0%,#1a3a2a 50%,#0d1f18 100%);flex-direction:column;align-items:center;justify-content:center;}
+.s6-logo{width:80px;height:80px;background:linear-gradient(135deg,#2e7d32,#43a047);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:36px;margin-bottom:20px;box-shadow:0 0 35px rgba(67,160,71,0.5);animation:pulse2 2.5s infinite;}
+@keyframes pulse2{0%,100%{box-shadow:0 0 25px rgba(67,160,71,0.4)}50%{box-shadow:0 0 50px rgba(67,160,71,0.8)}}
+.s6-title{font-size:32px;font-weight:800;color:#fff;text-align:center;margin-bottom:10px;}
+.s6-title span{color:#69f0ae;}
+.s6-sub{font-size:14px;color:#a5d6a7;margin-bottom:24px;text-align:center;}
+.s6-divider{width:80px;height:4px;background:linear-gradient(90deg,#69f0ae,#b9f6ca);border-radius:2px;margin:0 auto 24px;}
+.s6-pillars{display:flex;gap:14px;margin-bottom:24px;flex-wrap:wrap;justify-content:center;}
+.s6-pillar{background:rgba(255,255,255,0.08);border:1px solid rgba(105,240,174,0.2);border-radius:16px;padding:16px 20px;text-align:center;min-width:130px;backdrop-filter:blur(10px);}
+.s6-pillar .picon{font-size:26px;margin-bottom:8px;}
+.s6-pillar .pname{font-size:10px;color:#69f0ae;font-weight:700;text-transform:uppercase;letter-spacing:1px;}
+.s6-quote{background:rgba(105,240,174,0.08);border:1px solid rgba(105,240,174,0.2);border-radius:14px;padding:14px 28px;color:#a5d6a7;font-size:13px;text-align:center;max-width:680px;font-style:italic;line-height:1.7;}
+.s6-footer{margin-top:22px;display:flex;gap:24px;}
+.s6-footer-item{display:flex;align-items:center;gap:8px;color:rgba(255,255,255,0.4);font-size:11px;}
+</style>
+</head>
+<body>
+
+<button class="nav-btn" id="prevBtn" onclick="changeSlide(-1)">&#8249;</button>
+<button class="nav-btn" id="nextBtn" onclick="changeSlide(1)">&#8250;</button>
+<div class="slide-num" id="slideNumLabel">1 / 6</div>
+<div class="slide-counter">
+  <div class="dot active" onclick="goSlide(0)"></div>
+  <div class="dot" onclick="goSlide(1)"></div>
+  <div class="dot" onclick="goSlide(2)"></div>
+  <div class="dot" onclick="goSlide(3)"></div>
+  <div class="dot" onclick="goSlide(4)"></div>
+  <div class="dot" onclick="goSlide(5)"></div>
+</div>
+
+<!-- ========== SLIDE 1 — KULIT ========== -->
+<div class="slide active" id="slide1">
+  <svg class="wave" viewBox="0 0 1440 320" xmlns="http://www.w3.org/2000/svg">
+    <path fill="#ffffff" d="M0,160L48,144C96,128,192,96,288,106.7C384,117,480,171,576,181.3C672,192,768,160,864,138.7C960,117,1056,107,1152,122.7C1248,139,1344,181,1392,202.7L1440,224L1440,320L0,320Z"/>
+  </svg>
+  <div class="s1-badge">🏫 Sesi Akademik 2025 / 2026</div>
+  <div class="s1-logo">🛡️</div>
+  <div class="s1-title">Rumusan Pengurusan Salah Laku<br>& <span>Disiplin Pelajar 2026</span></div>
+  <div class="s1-sub">Sekolah Kebangsaan Bandar Tawau &nbsp;|&nbsp; Kod: XBA3051</div>
+  <div class="s1-divider"></div>
+  <div class="s1-cards">
+    <div class="s1-card"><div class="num">926</div><div class="lbl">Jumlah Murid</div></div>
+    <div class="s1-card"><div class="num">25</div><div class="lbl">Bilangan Kelas</div></div>
+    <div class="s1-card"><div class="num">20</div><div class="lbl">Kategori Salah Laku</div></div>
+    <div class="s1-card"><div class="num">1</div><div class="lbl">Kes Dilaporkan</div></div>
+  </div>
+  <div class="s1-info">
+    <div class="s1-info-item">👤 Guru Disiplin: Harsidi bin Junick</div>
+    <div class="s1-info-item">💻 Sistem: MOEIS / IDME</div>
+    <div class="s1-info-item">📅 8 April 2026</div>
+  </div>
+  <div class="s1-watermark">moeispel.moe.gov.my<br>Laporan Pelaporan Sahsiah HEM</div>
+</div>
+
+<!-- ========== SLIDE 2 — DEMOGRAFI ========== -->
+<div class="slide" id="slide2">
+  <div class="s2-header">
+    <h2>📊 Profil & <span>Demografi Pelajar</span></h2>
+    <p>Sekolah Kebangsaan Bandar Tawau (XBA3051) — Sesi 2025/2026</p>
+  </div>
+  <div class="s2-grid">
+    <div class="stat-card">
+      <h3>🧑‍🎓 Jumlah Keseluruhan Murid</h3>
+      <div class="big-stat"><div class="big-num">926</div><div class="big-label">orang murid<br>berdaftar</div></div>
+      <div class="gender-bar">
+        <div class="gender-label"><span class="name">👦 Lelaki</span><span class="val">474</span></div>
+        <div class="bar-track"><div class="bar-fill bar-lelaki" style="width:51.2%"></div></div>
+      </div>
+      <div class="gender-bar">
+        <div class="gender-label"><span class="name">👧 Perempuan</span><span class="val">452</span></div>
+        <div class="bar-track"><div class="bar-fill bar-perempuan" style="width:48.8%"></div></div>
+      </div>
+      <div class="gender-bar">
+        <div class="gender-label"><span class="name">🌍 Bukan Warganegara</span><span class="val">36</span></div>
+        <div class="bar-track"><div class="bar-fill bar-bukan" style="width:3.9%"></div></div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <h3>🌺 Taburan Mengikut Kaum</h3>
+      <div class="pie-wrap">
+        <svg width="120" height="120" viewBox="0 0 32 32">
+          <circle r="16" cx="16" cy="16" fill="transparent" stroke="#4caf50" stroke-width="32" stroke-dasharray="62 38" stroke-dashoffset="25" transform="rotate(-90 16 16)"/>
+          <circle r="16" cx="16" cy="16" fill="transparent" stroke="#2196f3" stroke-width="32" stroke-dasharray="26 74" stroke-dashoffset="-37" transform="rotate(-90 16 16)"/>
+          <circle r="16" cx="16" cy="16" fill="transparent" stroke="#ff9800" stroke-width="32" stroke-dasharray="10 90" stroke-dashoffset="-63" transform="rotate(-90 16 16)"/>
+          <circle r="16" cx="16" cy="16" fill="transparent" stroke="#9e9e9e" stroke-width="32" stroke-dasharray="2 98" stroke-dashoffset="-73" transform="rotate(-90 16 16)"/>
+          <circle r="10" cx="16" cy="16" fill="#1b2838"/>
+          <text x="16" y="17" text-anchor="middle" font-size="3" fill="#fff" font-weight="bold">Kaum</text>
+        </svg>
+        <div class="pie-legend">
+          <div class="legend-item"><div class="legend-dot" style="background:#4caf50"></div>Melayu — 573 orang (61.9%)</div>
+          <div class="legend-item"><div class="legend-dot" style="background:#2196f3"></div>Cina — 243 orang (26.3%)</div>
+          <div class="legend-item"><div class="legend-dot" style="background:#ff9800"></div>India & Lain — 110 orang (11.8%)</div>
+          <div class="legend-item"><div class="legend-dot" style="background:#9e9e9e"></div>Bukan WN — 36 orang (3.9%)</div>
+        </div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <h3>🕌 Taburan Mengikut Agama</h3>
+      <div class="agama-wrap">
+        <div class="agama-islam"><div class="agama-num">~590</div><div>Islam</div><div style="font-size:9px;opacity:0.8">≈63.7%</div></div>
+        <div class="agama-bukan"><div class="agama-num">~336</div><div>Bukan Islam</div><div style="font-size:9px;opacity:0.8">≈36.3%</div></div>
+      </div>
+      <div style="margin-top:14px;display:flex;gap:10px;justify-content:center;">
+        <div style="text-align:center;background:rgba(76,175,80,0.15);padding:9px 18px;border-radius:10px;">
+          <div style="font-size:20px;font-weight:800;color:#4caf50;">~590</div>
+          <div style="font-size:10px;color:#a5d6a7;">🌙 Islam</div>
+        </div>
+        <div style="text-align:center;background:rgba(156,39,176,0.15);padding:9px 18px;border-radius:10px;">
+          <div style="font-size:20px;font-weight:800;color:#ce93d8;">~336</div>
+          <div style="font-size:10px;color:#ce93d8;">✝ Bukan Islam</div>
+        </div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <h3>🏫 Senarai Kelas (25 Kelas)</h3>
+      <div class="kelas-grid">
+        <div class="kelas-chip">1 INOV</div><div class="kelas-chip">1 INTEL</div><div class="kelas-chip">1 KREA</div><div class="kelas-chip">1 KRIT</div><div class="kelas-chip">1 PAT</div><div class="kelas-chip" style="opacity:0.2">—</div>
+        <div class="kelas-chip">2 INOV</div><div class="kelas-chip">2 INTEL</div><div class="kelas-chip">2 KREA</div><div class="kelas-chip">2 KRIT</div><div class="kelas-chip">2 PAT</div><div class="kelas-chip" style="opacity:0.2">—</div>
+        <div class="kelas-chip">3 INOV</div><div class="kelas-chip">3 INTEL</div><div class="kelas-chip">3 KREA</div><div class="kelas-chip">3 KRIT</div><div class="kelas-chip">3 PAT</div><div class="kelas-chip" style="opacity:0.2">—</div>
+        <div class="kelas-chip">4 INOV</div><div class="kelas-chip">4 INTEL</div><div class="kelas-chip">4 KREA</div><div class="kelas-chip" style="opacity:0.2">—</div><div class="kelas-chip" style="opacity:0.2">—</div><div class="kelas-chip" style="opacity:0.2">—</div>
+        <div class="kelas-chip pra">PRA DAISY</div><div class="kelas-chip pra">PRA LILY</div><div class="kelas-chip pra">PRA ROSE</div><div class="kelas-chip pra">PRA TULIP</div><div class="kelas-chip" style="opacity:0.2">—</div><div class="kelas-chip" style="opacity:0.2">—</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== SLIDE 3 — 20 KATEGORI ========== -->
+<div class="slide" id="slide3">
+  <div class="s3-header">
+    <h2>⚠️ 20 Kategori <span>Salah Laku Disiplin</span></h2>
+    <p>Kategori yang direkodkan dalam Sistem IDME — Modul Pengurusan Sahsiah (MOEIS)</p>
+  </div>
+  <div class="cat-grid">
+    <div class="cat-card"><div class="cat-icon">🚫</div><div class="cat-num">01</div><div class="cat-name">Barang Larangan</div></div>
+    <div class="cat-card"><div class="cat-icon">💊</div><div class="cat-num">02</div><div class="cat-name">Dadah</div></div>
+    <div class="cat-card"><div class="cat-icon">👕</div><div class="cat-num">03</div><div class="cat-name">Kekemasan Diri</div></div>
+    <div class="cat-card"><div class="cat-icon">😈</div><div class="cat-num">04</div><div class="cat-name">Kenakalan</div></div>
+    <div class="cat-card"><div class="cat-icon">🏠</div><div class="cat-num">05</div><div class="cat-name">Kesalahan Asrama</div></div>
+    <div class="cat-card"><div class="cat-icon">💻</div><div class="cat-num">06</div><div class="cat-name">Kesalahan Siber</div></div>
+    <div class="cat-card"><div class="cat-icon">📋</div><div class="cat-num">07</div><div class="cat-name">Kes Khas</div></div>
+    <div class="cat-card"><div class="cat-icon">🗳️</div><div class="cat-num">08</div><div class="cat-name">Penglibatan Politik</div></div>
+    <div class="cat-card"><div class="cat-icon">👊</div><div class="cat-num">09</div><div class="cat-name">Salah Laku Buli</div></div>
+    <div class="cat-card"><div class="cat-icon">🏃</div><div class="cat-num">10</div><div class="cat-name">Salah Laku Ponteng</div></div>
+    <div class="cat-card"><div class="cat-icon">🚬</div><div class="cat-num">11</div><div class="cat-name">Salah Laku Rokok</div></div>
+    <div class="cat-card"><div class="cat-icon">💨</div><div class="cat-num">12</div><div class="cat-name">Rokok Elektronik / Vape</div></div>
+    <div class="cat-card"><div class="cat-icon">📱</div><div class="cat-num">13</div><div class="cat-name">Salah Laku Telefon Bimbit</div></div>
+    <div class="cat-card
