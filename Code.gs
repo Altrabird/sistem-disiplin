@@ -22,6 +22,12 @@ const PIN          = '';                       // cth: '169298' untuk kunci tuli
 const SHEET_NAME   = 'Kes';
 const FOLDER_NAME  = 'Bukti Disiplin SKBT';
 
+// (Pilihan) Simpan foto bukti dalam folder Drive PILIHAN anda.
+// Cipta folder di Drive, buka, dan salin ID dari URL:
+//   https://drive.google.com/drive/folders/<ID-INI>
+// Tampal ID itu di bawah. Kosongkan ('') untuk auto-cipta "Bukti Disiplin SKBT".
+const PHOTO_FOLDER_ID = '';
+
 // ── Sambungan roster murid dari sistem Hadir@SKBT ──
 // ID Google Sheet Hadir@SKBT (tab "Students", lajur Name & Class).
 // Akaun yang deploy skrip ini MESTI ada akses (view) kepada sheet ini.
@@ -44,6 +50,7 @@ function sheet_(){
 }
 
 function folder_(){
+  if (PHOTO_FOLDER_ID) { try { return DriveApp.getFolderById(PHOTO_FOLDER_ID); } catch (e) {} }
   let id = props_().getProperty('FOLDER_ID');
   if (id) { try { return DriveApp.getFolderById(id); } catch (e) {} }
   const f = DriveApp.createFolder(FOLDER_NAME);
