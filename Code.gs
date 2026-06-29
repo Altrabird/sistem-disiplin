@@ -21,6 +21,13 @@
 const PIN          = '';                       // cth: '169298' untuk kunci tulisan. '' = tiada PIN
 const SHEET_NAME   = 'Kes';
 const FOLDER_NAME  = 'Bukti Disiplin SKBT';
+
+// ── Sambungan roster murid dari sistem Hadir@SKBT ──
+// ID Google Sheet Hadir@SKBT (tab "Students", lajur Name & Class).
+// Akaun yang deploy skrip ini MESTI ada akses (view) kepada sheet ini.
+// Kosongkan ('') untuk matikan sambungan roster.
+const ROSTER_ID    = '1CiS8GhmhsDtOxZP0L3ZDmQDiA3DTbc1R0mQRQOfe1qY';
+const ROSTER_TAB   = 'Students';
 const HEADERS = ['id','tarikh','nama','kelas','jantina','kategori','tahap',
                  'butiran','tindakan','guru','status','foto','fotoId','dicipta','dikemaskini'];
 
@@ -54,8 +61,9 @@ function checkPin_(token){ return !PIN || String(token) === String(PIN); }
 /* ---------- API: GET (senarai / ping) ---------- */
 function doGet(e){
   const action = (e && e.parameter && e.parameter.action) || 'list';
-  if (action === 'ping') return json_({ ok:true, msg:'Sistem Disiplin GAS aktif', pin: !!PIN });
+  if (action === 'ping') return json_({ ok:true, msg:'Sistem Disiplin GAS aktif', pin: !!PIN, roster: !!ROSTER_ID });
   if (action === 'list') return json_({ ok:true, data: listKes_() });
+  if (action === 'students') return json_({ ok:true, data: listStudents_() });
   return json_({ ok:false, error:'Tindakan tidak dikenali' });
 }
 
@@ -70,6 +78,33 @@ function doPost(e){
   } catch (err) {
     return json_({ ok:false, error:String(err) });
   }
+}
+
+/* ---------- Roster murid (Hadir@SKBT) ---------- */
+function listStudents_(){
+  if (!ROSTER_ID) return [];
+  const cache = CacheService.getScriptCache();
+  const hit = cache.get('roster');
+  if (hit) { try { return JSON.parse(hit); } catch (e) {} }
+  let ss;
+  try { ss = SpreadsheetApp.openById(ROSTER_ID); } catch (e) { return []; }
+  const sh = ss.getSheetByName(ROSTER_TAB);
+  if (!sh) return [];
+  const vals = sh.getDataRange().getValues();
+  const head = vals.shift().map(h => String(h).trim().toLowerCase());
+  const ni = head.indexOf('name'), ci = head.indexOf('class');
+  if (ni < 0 || ci < 0) return [];
+  const seen = {}, out = [];
+  vals.forEach(r => {
+    const nama = String(r[ni] || '').trim(), kelas = String(r[ci] || '').trim();
+    if (!nama) return;
+    const k = nama + '|' + kelas;
+    if (seen[k]) return; seen[k] = 1;
+    out.push({ nama: nama, kelas: kelas });
+  });
+  out.sort((a,b) => a.kelas.localeCompare(b.kelas) || a.nama.localeCompare(b.nama));
+  try { cache.put('roster', JSON.stringify(out), 600); } catch (e) {}   // cache 10 minit
+  return out;
 }
 
 /* ---------- Operasi data ---------- */

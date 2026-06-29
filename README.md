@@ -10,7 +10,10 @@ Aplikasi web untuk merekod, memantau dan melaporkan kes salah laku & disiplin mu
 - **📝 Rekod Kes** — daftar, cari, tapis, kemaskini & padam kes. Pengesanan murid berulang automatik.
 - **⚖️ Panduan Tindakan** — penasihat tindakan pantas + 20 kategori salah laku (MOEIS/IDME) dengan cadangan tindakan berperingkat mengikut tahap keseriusan & kekerapan, selaras garis panduan KPM dan SPI berkaitan.
 - **📄 Laporan** — jana laporan ditapis, cetak/PDF dengan ruang tandatangan, dan eksport CSV.
-- **⚙️ Tetapan & Data** — maklumat sekolah, sandaran/import JSON, muat data contoh.
+- **🚨 Murid Berisiko** — murid berulang kes dikumpul & diberi tahap risiko (Rendah→Kritikal) dengan cadangan intervensi.
+- **⚙️ Tetapan & Data** — maklumat sekolah, mode penyimpanan (luar talian / awan), sandaran/import JSON.
+
+Bila mode awan aktif, app turut **menyambung ke roster murid Hadir@SKBT** (Google Sheet) supaya nama & kelas dalam borang kes sentiasa terkini.
 
 ## Teknologi
 

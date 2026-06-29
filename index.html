@@ -517,6 +517,7 @@ tbody tr:hover{background:var(--surface-2);}
             <button class="btn primary" onclick="saveSettings(true)"><svg class="ic"><use href="#i-check"/></svg> Simpan &amp; Sambung</button>
             <button class="btn" onclick="testConnection()"><svg class="ic"><use href="#i-cloud"/></svg> Uji Sambungan</button>
           </div>
+          <div class="notebox info" id="rosterInfo" style="margin-top:14px"><svg class="ic"><use href="#i-users"/></svg><span>Roster murid Hadir@SKBT akan dimuatkan automatik selepas sambung — nama &amp; kelas dalam borang kes diisi terus dari senarai terkini.</span></div>
         </div>
         <div class="card">
           <div class="card-h"><h3><svg class="ic"><use href="#i-db"/></svg> Sandaran &amp; Pemulihan Data</h3></div>
@@ -543,7 +544,7 @@ tbody tr:hover{background:var(--surface-2);}
     <div class="modal-b">
       <input type="hidden" id="c-id">
       <div class="form-grid">
-        <div class="field"><label>Nama Murid <span class="req">*</span></label><input id="c-nama" placeholder="Nama penuh murid"></div>
+        <div class="field"><label>Nama Murid <span class="req">*</span></label><input id="c-nama" list="namaList" placeholder="Taip nama murid…" autocomplete="off"><datalist id="namaList"></datalist><div class="hint" id="c-nama-hint"></div></div>
         <div class="field"><label>Kelas <span class="req">*</span></label><input id="c-kelas" list="kelasList" placeholder="cth: 4 INOV"><datalist id="kelasList"></datalist></div>
         <div class="field"><label>Jantina</label><select id="c-jantina"><option>Lelaki</option><option>Perempuan</option></select></div>
         <div class="field"><label>Tarikh Kejadian <span class="req">*</span></label><input type="date" id="c-tarikh"></div>
@@ -673,7 +674,35 @@ async function cloudLoad(){
   try{const res=await apiGet('action=list');if(!res.ok)throw new Error(res.error);
     CASES=(res.data||[]).map(c=>({...c,kategori:c.kategori}));save();setMode('cloud');}
   catch(e){setMode('error');toast('Gagal sambung awan — guna salinan tempatan');}
-  renderDashboard();renderRecords();
+  renderDashboard();renderRecords();renderRisiko();
+  loadRoster();
+}
+
+/* ---------- Roster murid (Hadir@SKBT) ---------- */
+let ROSTER=[];
+async function loadRoster(){
+  if(!CLOUD())return;
+  try{const res=await apiGet('action=students');if(res.ok&&res.data&&res.data.length){ROSTER=res.data;applyRoster();}}
+  catch(e){/* senyap — guna senarai lalai */}
+}
+function applyRoster(){
+  if(!ROSTER.length)return;
+  // datalist nama (papar kelas untuk rujukan)
+  document.getElementById('namaList').innerHTML=ROSTER.map(s=>`<option value="${esc(s.nama)}">${esc(s.kelas)}</option>`).join('');
+  // kelas unik
+  const kelas=[...new Set(ROSTER.map(s=>s.kelas).filter(Boolean))].sort();
+  document.getElementById('kelasList').innerHTML=kelas.map(k=>`<option value="${esc(k)}">`).join('');
+  document.getElementById('r-kelas').innerHTML='<option value="">Semua Kelas</option>'+kelas.map(k=>`<option>${esc(k)}</option>`).join('');
+  const info=document.getElementById('rosterInfo');
+  if(info)info.innerHTML=`<svg class="ic"><use href="#i-check"/></svg><span><b>${ROSTER.length} murid</b> dimuatkan dari roster Hadir@SKBT (${kelas.length} kelas). Nama &amp; kelas borang kes kini diisi dari senarai terkini.</span>`;
+}
+function onNamaInput(){
+  const v=document.getElementById('c-nama').value.trim().toLowerCase();
+  const m=ROSTER.find(s=>s.nama.toLowerCase()===v);
+  const hint=document.getElementById('c-nama-hint');
+  if(m){document.getElementById('c-kelas').value=m.kelas;if(hint)hint.innerHTML=`<svg class="ic" style="width:13px;height:13px;color:var(--green)"><use href="#i-check"/></svg> Kelas <b>${esc(m.kelas)}</b> diisi dari roster Hadir@SKBT`;}
+  else if(hint){hint.textContent='';}
+  showCadangan();
 }
 
 /* ---------- Foto: mampatan & lightbox ---------- */
@@ -916,6 +945,7 @@ function openCaseModal(id){
   document.getElementById('caseOverlay').classList.add('show');
   const t=document.getElementById('modalTitle');
   pendingFoto=null;removeExisting=false;
+  document.getElementById('c-nama-hint').textContent='';
   if(id){
     const c=CASES.find(x=>String(x.id)===String(id));if(!c)return;
     t.innerHTML=ico('edit')+' Kemaskini Kes';
@@ -1066,7 +1096,7 @@ function saveSettings(connect){
 async function testConnection(){
   const url=val('set-api');if(!url){toast('Sila masukkan URL Web App dahulu');return;}
   SETTINGS.api=url;SETTINGS.pin=val('set-pin');setMode('loading');
-  try{const res=await apiGet('action=ping');if(res.ok){setMode('cloud');toast('Sambungan berjaya — sistem awan aktif');}else throw new Error(res.error);}
+  try{const res=await apiGet('action=ping');if(res.ok){setMode('cloud');toast('Sambungan berjaya — sistem awan aktif');loadRoster();}else throw new Error(res.error);}
   catch(e){setMode('error');toast('Sambungan gagal — semak URL & tetapan deployment');}
 }
 function exportJSON(){dl(JSON.stringify({cases:CASES,settings:SETTINGS,exported:new Date().toISOString()},null,2),'sandaran-disiplin-'+Date.now()+'.json','application/json');toast('Sandaran dieksport');}
@@ -1105,7 +1135,7 @@ function initAll(){
   if(CLOUD()){cloudLoad();}else{setMode('offline');renderDashboard();renderRecords();}
 }
 document.getElementById('c-tahap').addEventListener('change',showCadangan);
-document.getElementById('c-nama').addEventListener('input',showCadangan);
+document.getElementById('c-nama').addEventListener('input',onNamaInput);
 document.getElementById('c-kelas').addEventListener('input',showCadangan);
 ['caseOverlay','guideOverlay','riskOverlay'].forEach(id=>document.getElementById(id).addEventListener('click',e=>{if(e.target.id===id)e.currentTarget.classList.remove('show');}));
 document.addEventListener('keydown',e=>{if(e.key==='Escape')document.querySelectorAll('.overlay.show').forEach(o=>o.classList.remove('show'));});

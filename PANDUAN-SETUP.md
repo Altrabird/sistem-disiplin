@@ -49,6 +49,15 @@ Buka app (cth dari GitHub Pages), pergi **Tetapan & Data**, tampal **URL Web App
 
 ---
 
+## Sambungan roster Hadir@SKBT (nama & kelas automatik)
+
+Apabila mode awan aktif, app akan **muat turun senarai murid terkini** dari Google Sheet Hadir@SKBT (tab **Students**, lajur `Name` & `Class`). Dalam borang **Rekod Kes Baharu**, taip nama murid → app cadangkan dari roster dan **isi kelas secara automatik**.
+
+Syarat: akaun Google yang anda guna untuk deploy skrip ini **mesti ada akses (sekurang-kurangnya View)** kepada Sheet Hadir@SKBT. Jika tidak, kongsikan sheet itu kepada akaun anda dahulu.
+
+- ID sheet roster ditetapkan dalam `Code.gs` (`const ROSTER_ID = '...'`). Tukar jika sheet berubah, atau kosongkan `''` untuk matikan sambungan roster (app guna senarai kelas lalai).
+- Status roster dipaparkan dalam **Tetapan & Data ▸ Mode Penyimpanan** (cth: *"926 murid dimuatkan…"*).
+
 ## Nota privasi (penting)
 
 - Data & foto disimpan dalam **akaun Google anda**, bukan pihak ketiga.
