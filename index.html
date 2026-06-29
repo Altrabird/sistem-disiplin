@@ -544,8 +544,8 @@ tbody tr:hover{background:var(--surface-2);}
     <div class="modal-b">
       <input type="hidden" id="c-id">
       <div class="form-grid">
-        <div class="field"><label>Nama Murid <span class="req">*</span></label><input id="c-nama" list="namaList" placeholder="Taip nama murid…" autocomplete="off"><datalist id="namaList"></datalist><div class="hint" id="c-nama-hint"></div></div>
-        <div class="field"><label>Kelas <span class="req">*</span></label><input id="c-kelas" list="kelasList" placeholder="cth: 4 INOV"><datalist id="kelasList"></datalist></div>
+        <div class="field"><label>Kelas <span class="req">*</span></label><input id="c-kelas" list="kelasList" placeholder="Pilih kelas…" autocomplete="off"><datalist id="kelasList"></datalist></div>
+        <div class="field"><label>Nama Murid <span class="req">*</span></label><input id="c-nama" list="namaList" placeholder="Pilih kelas dahulu…" autocomplete="off"><datalist id="namaList"></datalist><div class="hint" id="c-nama-hint"></div></div>
         <div class="field"><label>Jantina</label><select id="c-jantina"><option>Lelaki</option><option>Perempuan</option></select></div>
         <div class="field"><label>Tarikh Kejadian <span class="req">*</span></label><input type="date" id="c-tarikh"></div>
         <div class="field"><label>Kategori Salah Laku <span class="req">*</span></label><select id="c-kategori" onchange="onKategoriPick()"></select></div>
@@ -687,21 +687,22 @@ async function loadRoster(){
 }
 function applyRoster(){
   if(!ROSTER.length)return;
-  // datalist nama (papar kelas untuk rujukan)
-  document.getElementById('namaList').innerHTML=ROSTER.map(s=>`<option value="${esc(s.nama)}">${esc(s.kelas)}</option>`).join('');
-  // kelas unik
   const kelas=[...new Set(ROSTER.map(s=>s.kelas).filter(Boolean))].sort();
   document.getElementById('kelasList').innerHTML=kelas.map(k=>`<option value="${esc(k)}">`).join('');
   document.getElementById('r-kelas').innerHTML='<option value="">Semua Kelas</option>'+kelas.map(k=>`<option>${esc(k)}</option>`).join('');
   const info=document.getElementById('rosterInfo');
-  if(info)info.innerHTML=`<svg class="ic"><use href="#i-check"/></svg><span><b>${ROSTER.length} murid</b> dimuatkan dari roster Hadir@SKBT (${kelas.length} kelas). Nama &amp; kelas borang kes kini diisi dari senarai terkini.</span>`;
+  if(info)info.innerHTML=`<svg class="ic"><use href="#i-check"/></svg><span><b>${ROSTER.length} murid</b> dimuatkan dari roster Hadir@SKBT (${kelas.length} kelas). Dalam borang kes: pilih kelas dahulu, kemudian pilih nama murid.</span>`;
 }
-function onNamaInput(){
-  const v=document.getElementById('c-nama').value.trim().toLowerCase();
-  const m=ROSTER.find(s=>s.nama.toLowerCase()===v);
-  const hint=document.getElementById('c-nama-hint');
-  if(m){document.getElementById('c-kelas').value=m.kelas;if(hint)hint.innerHTML=`<svg class="ic" style="width:13px;height:13px;color:var(--green)"><use href="#i-check"/></svg> Kelas <b>${esc(m.kelas)}</b> diisi dari roster Hadir@SKBT`;}
-  else if(hint){hint.textContent='';}
+function onKelasPick(){
+  const kelas=document.getElementById('c-kelas').value.trim();
+  const hint=document.getElementById('c-nama-hint'), nameInput=document.getElementById('c-nama');
+  if(ROSTER.length){
+    const studs=ROSTER.filter(s=>s.kelas.toLowerCase()===kelas.toLowerCase());
+    document.getElementById('namaList').innerHTML=studs.map(s=>`<option value="${esc(s.nama)}"></option>`).join('');
+    if(!kelas){nameInput.placeholder='Pilih kelas dahulu…';if(hint)hint.textContent='';}
+    else if(studs.length){nameInput.placeholder='Taip / pilih nama murid…';if(hint)hint.innerHTML=`<svg class="ic" style="width:13px;height:13px;color:var(--green)"><use href="#i-users"/></svg> ${studs.length} murid dalam kelas <b>${esc(kelas)}</b>`;}
+    else{nameInput.placeholder='Taip nama murid…';if(hint)hint.innerHTML='<span style="color:var(--amber)">Kelas tiada dalam roster — taip nama secara manual</span>';}
+  }
   showCadangan();
 }
 
@@ -966,7 +967,7 @@ function openCaseModal(id){
     renderFotoPreview(null);
     onKategoriPick();
   }
-  showCadangan();
+  onKelasPick();
 }
 function closeCaseModal(){document.getElementById('caseOverlay').classList.remove('show');}
 function onKategoriPick(){const k=katObj(document.getElementById('c-kategori').value);if(k)document.getElementById('c-tahap').value=k.def;showCadangan();}
@@ -1135,8 +1136,9 @@ function initAll(){
   if(CLOUD()){cloudLoad();}else{setMode('offline');renderDashboard();renderRecords();}
 }
 document.getElementById('c-tahap').addEventListener('change',showCadangan);
-document.getElementById('c-nama').addEventListener('input',onNamaInput);
-document.getElementById('c-kelas').addEventListener('input',showCadangan);
+document.getElementById('c-nama').addEventListener('input',showCadangan);
+document.getElementById('c-kelas').addEventListener('input',onKelasPick);
+document.getElementById('c-kelas').addEventListener('change',onKelasPick);
 ['caseOverlay','guideOverlay','riskOverlay'].forEach(id=>document.getElementById(id).addEventListener('click',e=>{if(e.target.id===id)e.currentTarget.classList.remove('show');}));
 document.addEventListener('keydown',e=>{if(e.key==='Escape')document.querySelectorAll('.overlay.show').forEach(o=>o.classList.remove('show'));});
 initAll();
