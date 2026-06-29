@@ -227,6 +227,18 @@ tbody tr:hover{background:var(--surface-2);}
 .lightbox{align-items:center;justify-content:center;cursor:zoom-out;padding:30px;}
 .lightbox img{max-width:92vw;max-height:90vh;border-radius:12px;box-shadow:var(--sh-lg);}
 
+/* ===== chart tooltip + drill-down ===== */
+.chart-tip{position:fixed;z-index:95;display:none;background:var(--ink);color:#fff;padding:8px 12px;border-radius:9px;font-size:12px;line-height:1.45;box-shadow:var(--sh-lg);pointer-events:none;max-width:230px;}
+.chart-tip b{font-weight:700;}
+.chart-tip .v{color:#93c5fd;font-family:var(--mono);font-size:11.5px;}
+.barrow.clickable{cursor:pointer;border-radius:8px;transition:background .14s;}
+.barrow.clickable:hover{background:var(--surface-2);}
+.barrow.clickable:hover .barfill{filter:brightness(1.1);}
+.barrow.clickable:hover .vl{color:var(--brand);}
+svg circle[data-tt],svg [data-drill]{cursor:pointer;}
+.legrow.clickable{cursor:pointer;padding:3px 7px;margin:-3px -7px;border-radius:7px;transition:background .14s;}
+.legrow.clickable:hover{background:var(--surface-2);}
+
 /* ===== risk cards ===== */
 .risk-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:16px;}
 .risk-card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--sh-sm);overflow:hidden;cursor:pointer;transition:transform .18s,box-shadow .18s;border-left:4px solid var(--ink-3);}
@@ -604,6 +616,7 @@ tbody tr:hover{background:var(--surface-2);}
   <img id="lightboxImg" alt="Foto bukti penuh">
 </div>
 
+<div class="chart-tip" id="chartTip"></div>
 <div class="toast" id="toast"><svg class="ic"><use href="#i-check"/></svg><span id="toastMsg"></span></div>
 
 <script>
@@ -780,6 +793,11 @@ function fmtDate(d){if(!d)return '-';const x=new Date(d);if(isNaN(x))return d;re
 function pct(n,t){return t?Math.round(n/t*100):0;}
 function freqFor(nama,kelas,exclId){return CASES.filter(c=>c.id!==exclId && (c.nama||'').trim().toLowerCase()===(nama||'').trim().toLowerCase() && c.kelas===kelas).length+1;}
 function emptyMini(){return `<div class="empty">${ico('inbox')}<p>Tiada data</p></div>`;}
+/* ---------- chart tooltip + drill-down ---------- */
+function showTip(e,title,sub){const t=document.getElementById('chartTip');t.innerHTML=`<b>${title||''}</b>`+(sub?`<br><span class="v">${sub}</span>`:'');t.style.display='block';const pad=14,w=t.offsetWidth,hh=t.offsetHeight;let x=e.clientX+pad,y=e.clientY+pad;if(x+w>window.innerWidth)x=e.clientX-w-pad;if(y+hh>window.innerHeight)y=e.clientY-hh-pad;t.style.left=Math.max(6,x)+'px';t.style.top=Math.max(6,y)+'px';}
+function tipHide(){const t=document.getElementById('chartTip');if(t)t.style.display='none';}
+function drillRecords(o){['f-kategori','f-tahap','f-status'].forEach(i=>document.getElementById(i).value='');document.getElementById('f-search').value=o.search||'';if(o.kategori!=null)document.getElementById('f-kategori').value=o.kategori;if(o.tahap)document.getElementById('f-tahap').value=o.tahap;if(o.status)document.getElementById('f-status').value=o.status;tipHide();go('records');toast('Ditapis dari carta — '+(o.tahap||o.status||o.search||katName(o.kategori)));}
+function drillReport(m){document.getElementById('r-bulan').value=m;tipHide();go('report');}
 function fotoCell(c){return c.foto?`<img class="thumb" src="${esc(c.foto)}" onclick="showLightbox(this.src)" loading="lazy" alt="Foto bukti kes ${esc(c.nama)}">`:`<span class="no-thumb" title="Tiada foto">${ico('image')}</span>`;}
 
 /* ====================== NAV ====================== */
@@ -817,7 +835,7 @@ function renderDashboard(){
   const maxK=Math.max(1,...katRows.map(r=>r[1]));
   document.getElementById('chart-kategori').innerHTML = katRows.length?katRows.map(([id,n])=>{
     const col=sevColor(katObj(id).def);
-    return `<div class="barrow"><div class="nm">${katBadge(id)}${esc(katName(id))}</div><div class="bartrack"><div class="barfill" style="width:${n/maxK*100}%;background:linear-gradient(90deg,${col},${col})"></div></div><div class="vl">${n}</div></div>`;}).join('') : emptyMini();
+    return `<div class="barrow clickable" data-tt="${esc(katName(id))}" data-ts="${n} kes · ${pct(n,tot)}% · klik untuk senarai" data-drill='{"t":"rec","o":{"kategori":"${id}"}}'><div class="nm">${katBadge(id)}${esc(katName(id))}</div><div class="bartrack"><div class="barfill" style="width:${n/maxK*100}%;background:linear-gradient(90deg,${col},${col})"></div></div><div class="vl">${n}</div></div>`;}).join('') : emptyMini();
 
   const sev={Ringan:0,Sederhana:0,Berat:0};CASES.forEach(c=>sev[c.tahap]=(sev[c.tahap]||0)+1);
   document.getElementById('chart-tahap').innerHTML = tot? donut([['Ringan',sev.Ringan,'#16a34a'],['Sederhana',sev.Sederhana,'#d97706'],['Berat',sev.Berat,'#dc2626']],tot) : emptyMini();
@@ -826,13 +844,13 @@ function renderDashboard(){
   const stc={Dilaporkan:'#2563eb','Dalam Tindakan':'#d97706',Selesai:'#16a34a'};
   const maxS=Math.max(1,...Object.values(st));
   document.getElementById('chart-status').innerHTML=Object.entries(st).map(([k,n])=>
-    `<div class="barrow"><div class="nm">${k}</div><div class="bartrack"><div class="barfill" style="width:${n/maxS*100}%;background:${stc[k]}"></div></div><div class="vl">${n}</div></div>`).join('');
+    `<div class="barrow clickable" data-tt="${esc(k)}" data-ts="${n} kes · ${pct(n,tot)}% · klik untuk senarai" data-drill='{"t":"rec","o":{"status":"${esc(k)}"}}'><div class="nm">${k}</div><div class="bartrack"><div class="barfill" style="width:${n/maxS*100}%;background:${stc[k]}"></div></div><div class="vl">${n}</div></div>`).join('');
 
   const byKls={};CASES.forEach(c=>byKls[c.kelas]=(byKls[c.kelas]||0)+1);
   const klsRows=Object.entries(byKls).sort((a,b)=>b[1]-a[1]).slice(0,8);
   const maxKl=Math.max(1,...klsRows.map(r=>r[1]));
   document.getElementById('chart-kelas').innerHTML=klsRows.length?klsRows.map(([k,n])=>
-    `<div class="barrow"><div class="nm">${esc(k)}</div><div class="bartrack"><div class="barfill" style="width:${n/maxKl*100}%;background:linear-gradient(90deg,#1e40af,#3b82f6)"></div></div><div class="vl">${n}</div></div>`).join(''):emptyMini();
+    `<div class="barrow clickable" data-tt="Kelas ${esc(k)}" data-ts="${n} kes · klik untuk senarai" data-drill='{"t":"rec","o":{"search":"${esc(k)}"}}'><div class="nm">${esc(k)}</div><div class="bartrack"><div class="barfill" style="width:${n/maxKl*100}%;background:linear-gradient(90deg,#1e40af,#3b82f6)"></div></div><div class="vl">${n}</div></div>`).join(''):emptyMini();
 
   const mon=Array(12).fill(0);CASES.forEach(c=>{const d=new Date(c.tarikh);if(!isNaN(d))mon[d.getMonth()]++;});
   document.getElementById('chart-tren').innerHTML=lineChart(mon);
@@ -845,8 +863,8 @@ function renderDashboard(){
 function donut(parts,tot){
   const cx=18,cy=18,r=14.5,sw=4.6,C=2*Math.PI*r;   // outer edge 16.8 < 18 → tiada lagi terpotong
   let off=0,seg='';
-  parts.forEach(([nm,v,col])=>{if(v<=0)return;const len=(v/tot)*C;seg+=`<circle r="${r}" cx="${cx}" cy="${cy}" fill="none" stroke="${col}" stroke-width="${sw}" stroke-dasharray="${len} ${C-len}" stroke-dashoffset="${-off}" transform="rotate(-90 ${cx} ${cy})"/>`;off+=len;});
-  const leg=parts.map(([nm,v,col])=>`<div class="legrow"><span class="legdot" style="background:${col}"></span>${nm} <b>${v} <span style="color:var(--ink-3);font-weight:500">(${pct(v,tot)}%)</span></b></div>`).join('');
+  parts.forEach(([nm,v,col])=>{if(v<=0)return;const len=(v/tot)*C;seg+=`<circle r="${r}" cx="${cx}" cy="${cy}" fill="none" stroke="${col}" stroke-width="${sw}" stroke-dasharray="${len} ${C-len}" stroke-dashoffset="${-off}" transform="rotate(-90 ${cx} ${cy})" data-tt="Tahap ${nm}" data-ts="${v} kes · ${pct(v,tot)}% · klik untuk senarai" data-drill='{"t":"rec","o":{"tahap":"${nm}"}}'/>`;off+=len;});
+  const leg=parts.map(([nm,v,col])=>`<div class="legrow clickable" data-tt="Tahap ${nm}" data-ts="${v} kes · ${pct(v,tot)}% · klik untuk senarai" data-drill='{"t":"rec","o":{"tahap":"${nm}"}}'><span class="legdot" style="background:${col}"></span>${nm} <b>${v} <span style="color:var(--ink-3);font-weight:500">(${pct(v,tot)}%)</span></b></div>`).join('');
   return `<svg width="124" height="124" viewBox="0 0 36 36"><circle r="${r}" cx="${cx}" cy="${cy}" fill="none" stroke="var(--line-2)" stroke-width="${sw}"/>${seg}<text class="mono" x="18" y="17.6" text-anchor="middle" font-size="7" font-weight="700" fill="var(--ink)">${tot}</text><text x="18" y="22.6" text-anchor="middle" font-size="2.8" fill="var(--ink-3)" letter-spacing=".3">KES</text></svg><div class="legend">${leg}</div>`;
 }
 function lineChart(data){
@@ -857,10 +875,11 @@ function lineChart(data){
   let area=`${pad.l},${pad.t+ih} ${pts} ${pad.l+iw},${pad.t+ih}`;
   let grid='';for(let g=0;g<=2;g++){const gy=pad.t+ih-(g/2)*ih;const gv=Math.round(max*g/2);grid+=`<line x1="${pad.l}" y1="${gy}" x2="${W-pad.r}" y2="${gy}" stroke="var(--line)" stroke-width="1"/><text class="mono" x="${pad.l-6}" y="${gy+3}" text-anchor="end" font-size="8" fill="var(--ink-3)">${gv}</text>`;}
   let dots=data.map((v,i)=>`<circle cx="${x(i)}" cy="${y(v)}" r="${v>0?2.6:1.6}" fill="${v>0?'var(--brand)':'var(--ink-3)'}"/>`).join('');
+  let hits=data.map((v,i)=>`<circle cx="${x(i)}" cy="${y(v)}" r="10" fill="transparent" data-tt="${BULAN[i]} 2026" data-ts="${v} kes · klik untuk laporan bulan" data-drill='{"t":"rep","v":"${i}"}'/>`).join('');
   let labels=data.map((v,i)=>`<text x="${x(i)}" y="${H-7}" text-anchor="middle" font-size="8" fill="var(--ink-3)">${BULAN[i].slice(0,1)}</text>`).join('');
   return `<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto" preserveAspectRatio="xMidYMid meet">
     <defs><linearGradient id="lg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#3b82f6" stop-opacity=".28"/><stop offset="100%" stop-color="#3b82f6" stop-opacity="0"/></linearGradient></defs>
-    ${grid}<polygon points="${area}" fill="url(#lg)"/><polyline points="${pts}" fill="none" stroke="var(--brand)" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>${dots}${labels}</svg>`;
+    ${grid}<polygon points="${area}" fill="url(#lg)"/><polyline points="${pts}" fill="none" stroke="var(--brand)" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>${dots}${labels}${hits}</svg>`;
 }
 
 /* ====================== RECORDS ====================== */
@@ -1181,6 +1200,9 @@ document.getElementById('c-kelas').addEventListener('input',onKelasPick);
 document.getElementById('c-kelas').addEventListener('change',onKelasPick);
 ['caseOverlay','guideOverlay','riskOverlay'].forEach(id=>document.getElementById(id).addEventListener('click',e=>{if(e.target.id===id)e.currentTarget.classList.remove('show');}));
 document.addEventListener('keydown',e=>{if(e.key==='Escape')document.querySelectorAll('.overlay.show').forEach(o=>o.classList.remove('show'));});
+// hover tooltip + click-to-drill untuk semua carta
+document.addEventListener('mousemove',e=>{const el=e.target.closest?e.target.closest('[data-tt]'):null;if(el)showTip(e,el.getAttribute('data-tt'),el.getAttribute('data-ts'));else tipHide();});
+document.addEventListener('click',e=>{const el=e.target.closest?e.target.closest('[data-drill]'):null;if(!el)return;try{const d=JSON.parse(el.getAttribute('data-drill'));if(d.t==='rec')drillRecords(d.o);else if(d.t==='rep')drillReport(d.v);}catch(x){}});
 initAll();
 </script>
 </body>
