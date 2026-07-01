@@ -112,6 +112,9 @@ Student data is PDPA-sensitive. Keep the Sheet/folder private; the public surfac
 - [ ] `LockService` on writes; server-side pagination for large datasets
 - [ ] PWA install + offline service worker
 - [ ] Trend analytics: recidivism rate, category trends YoY
+- [x] ~~Presentation mode (fullscreen slideshow)~~ — done v1.3.0
+- [x] ~~Auto-generated narrative report text (on-device)~~ — done v1.3.0
+- [ ] Optional AI-enhanced report text (only with an anonymising step — do NOT send raw student data to external APIs)
 - [ ] Roster sync for jantina (auto-fill gender from Hadir@SKBT if available)
 
 ## 10. Deploy

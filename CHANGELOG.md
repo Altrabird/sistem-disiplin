@@ -2,6 +2,15 @@
 
 Format based on [Keep a Changelog](https://keepachangelog.com/). Dates are absolute.
 
+## [1.3.0] — 2026-07-01
+
+### Added
+- **Mode Persembahan** — one-click fullscreen PPT-style slideshow generated live from the dashboard data (cover, KPIs, severity donut, category bars, status/class, monthly trend, at-risk students, closing). Arrow/keyboard/dot navigation.
+- **Jana Teks Laporan** — auto-generates a formal Bahasa Melayu narrative report from the data (intro → summary → top categories → classes → at-risk → trend → recommendations → closing) in an editable modal with copy and .txt download. Generated **on-device** — no student data sent to any external API (PDPA-safe).
+- **Guru Pelapor** dropdown with preset names (Harsidi bin Junick, Abbas Osman) + manual add (persisted; managed in Settings).
+
+---
+
 ## [1.2.0] — 2026-07-01
 
 ### Added
