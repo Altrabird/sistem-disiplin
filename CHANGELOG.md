@@ -2,6 +2,15 @@
 
 Format based on [Keep a Changelog](https://keepachangelog.com/). Dates are absolute.
 
+## [1.2.0] — 2026-07-01
+
+### Added
+- **Multiple photo evidence per case** — pick several images at once, add more anytime, remove individually. Records/report show the first thumbnail with a "+N" badge; clicking opens a navigable lightbox (arrows, counter, keyboard ←/→). Stored as newline-delimited lists in `foto`/`fotoId`.
+
+> Cloud mode requires **redeploying `Code.gs`** (new version) for multi-photo upload/delete; offline mode works immediately.
+
+---
+
 ## [1.1.0] — 2026-07-01
 
 ### Added
