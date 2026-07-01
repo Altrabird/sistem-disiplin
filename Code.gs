@@ -156,15 +156,23 @@ function saveKes_(rec, fotoData){
   }
   const merged = Object.assign({}, existing, rec);   // rec menimpa nilai sedia ada
 
-  if (fotoData) {                                     // ada foto baharu → simpan ke Drive
-    if (existing.fotoId) { try { DriveApp.getFileById(existing.fotoId).setTrashed(true); } catch (e) {} }
-    const p = savePhoto_(fotoData, rec.id);
-    merged.foto = p.url; merged.fotoId = p.id;
+  // Foto bukti — sokong BERBILANG (dipisah baris baharu).
+  // rec.foto/rec.fotoId = foto sedia ada yang dikekalkan; fotoData = foto baharu (dataURL, boleh array).
+  const oldIds  = String(existing.fotoId || '').split('\n').filter(String);
+  const keepIds = String(rec.fotoId   || '').split('\n').filter(String);
+  oldIds.filter(function (id) { return keepIds.indexOf(id) < 0; })
+        .forEach(function (id) { try { DriveApp.getFileById(id).setTrashed(true); } catch (e) {} });
+  var urls = String(rec.foto || '').split('\n').filter(String);
+  var ids  = keepIds.slice();
+  if (fotoData) {
+    (Array.isArray(fotoData) ? fotoData : [fotoData]).forEach(function (du) {
+      if (!du) return;
+      var p = savePhoto_(du, rec.id);
+      urls.push(p.url); ids.push(p.id);
+    });
   }
-  if (rec.foto === '' && !fotoData && existing.fotoId) {   // foto dibuang
-    try { DriveApp.getFileById(existing.fotoId).setTrashed(true); } catch (e) {}
-    merged.foto = ''; merged.fotoId = '';
-  }
+  merged.foto   = urls.join('\n');
+  merged.fotoId = ids.join('\n');
 
   if (!merged.dicipta) merged.dicipta = new Date().toISOString();
   merged.dikemaskini = new Date().toISOString();
@@ -180,7 +188,8 @@ function deleteKes_(id){
   const fcol = head.indexOf('fotoId');
   for (let i = 1; i < data.length; i++) {
     if (String(data[i][0]) === String(id)) {
-      if (data[i][fcol]) { try { DriveApp.getFileById(data[i][fcol]).setTrashed(true); } catch (e) {} }
+      String(data[i][fcol] || '').split('\n').filter(String)
+        .forEach(function (fid) { try { DriveApp.getFileById(fid).setTrashed(true); } catch (e) {} });
       sh.deleteRow(i + 1);
       break;
     }
