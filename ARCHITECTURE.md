@@ -28,9 +28,12 @@ A **case** object (one discipline record):
   guru,          // reporting teacher
   status,        // 'Dilaporkan' | 'Dalam Tindakan' | 'Selesai'
   foto, fotoId,  // Drive thumbnail URL + file id (cloud) OR dataURL (offline)
+  kesId,         // groups multiple pelaku (perpetrators) of the SAME incident
   dicipta, dikemaskini  // ISO timestamps (cloud sets dikemaskini)
 }
 ```
+
+**One row per pelaku.** A single incident with multiple perpetrators is stored as N case records sharing a `kesId` and identical incident fields (date/category/severity/description/action/photo), differing only in `nama`/`kelas`/`jantina`. This keeps all per-student stats (dashboard, risk, reports) correct without special-casing. The "Rekod Kes Baharu" form adds pelaku rows; **edit** operates on a single record.
 
 In-memory source of truth = `CASES` array. `SETTINGS` holds school info + `api` (GAS URL) + `pin`.
 

@@ -2,6 +2,17 @@
 
 Format based on [Keep a Changelog](https://keepachangelog.com/). Dates are absolute.
 
+## [1.1.0] — 2026-07-01
+
+### Added
+- **Multiple pelaku per case** — record several perpetrators for one incident; shared incident details, each pelaku (kelas → nama → jantina) saved as a linked record sharing a `kesId`.
+
+### Fixed
+- **Photo orientation** — phone photos no longer appear sideways (EXIF respected via `createImageBitmap`).
+- **Photo upload layout** — full-width centered dropzone (icon over label); preview shows the full upright image (`object-fit:contain`), centered.
+
+---
+
 ## [1.0.0] — 2026-06-29 — 🎉 Milestone: production-ready
 
 First complete, deployed release. Live at https://altrabird.github.io/sistem-disiplin/
