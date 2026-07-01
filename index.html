@@ -51,6 +51,7 @@ a{color:var(--brand-2);text-decoration:none;}
 .topbar h2{font-size:18px;font-weight:700;letter-spacing:-.3px;}
 .topbar .sub{font-size:12px;color:var(--ink-2);margin-top:1px;}
 .topbar-l{display:flex;align-items:center;gap:14px;}
+.topbar-logo{width:36px;height:38px;object-fit:contain;flex-shrink:0;}
 .content{padding:26px 30px 64px;max-width:1320px;width:100%;}
 .view{display:none;}
 .view.active{display:block;animation:fade .35s ease;}
@@ -443,6 +444,7 @@ svg circle[data-tt],svg [data-drill]{cursor:pointer;}
     <header class="topbar">
       <div class="topbar-l">
         <button class="btn sm icon-only menu-toggle" onclick="document.getElementById('sidebar').classList.toggle('open')"><svg class="ic"><use href="#i-menu"/></svg></button>
+        <img src="logo.png" class="topbar-logo" alt="Logo SK Bandar Tawau">
         <div>
           <h2 id="pageTitle">Papan Pemuka</h2>
           <div class="sub" id="pageSub">Ringkasan keseluruhan pengurusan disiplin</div>
