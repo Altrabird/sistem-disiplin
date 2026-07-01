@@ -544,6 +544,15 @@ svg circle[data-tt],svg [data-drill]{cursor:pointer;}
           <button class="btn primary" onclick="saveSettings()"><svg class="ic"><use href="#i-check"/></svg> Simpan Tetapan</button>
         </div>
         <div class="card">
+          <div class="card-h"><h3><svg class="ic"><use href="#i-users"/></svg> Senarai Guru Pelapor</h3></div>
+          <p class="hint" style="margin-bottom:12px">Nama yang muncul dalam pilihan "Guru Pelapor" borang kes. Nama baharu yang ditaip semasa merekod turut disimpan di sini automatik.</p>
+          <div id="guruChips" class="chips" style="margin-bottom:12px"></div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <input id="guruNew" placeholder="Nama guru baharu…" autocomplete="off" onkeydown="if(event.key==='Enter')addGuru()" style="flex:1;min-width:200px;padding:9px 12px;border:1px solid var(--line);border-radius:10px;background:var(--surface)">
+            <button class="btn primary" onclick="addGuru()"><svg class="ic"><use href="#i-plus"/></svg> Tambah</button>
+          </div>
+        </div>
+        <div class="card">
           <div class="card-h"><h3><svg class="ic"><use href="#i-cloud"/></svg> Mode Penyimpanan Data</h3><span class="mode-badge" id="modeBadge2">Luar Talian</span></div>
           <p class="hint" style="margin-bottom:14px">URL Web App telah <b>ditetapkan secara lalai</b> & dikunci dengan PIN. Cuma <b>masukkan PIN</b> sekali pada setiap peranti, kemudian klik Simpan &amp; Sambung. (Kosongkan URL untuk mod luar talian.)</p>
           <div class="form-grid">
@@ -606,7 +615,9 @@ svg circle[data-tt],svg [data-drill]{cursor:pointer;}
           <input type="file" id="c-foto" accept="image/*" capture="environment" multiple style="display:none" onchange="onFotoPick(event)">
         </label>
       </div>
-      <div class="field full"><label>Guru Pelapor</label><input id="c-guru" placeholder="Nama guru"></div>
+      <div class="field full"><label>Guru Pelapor</label>
+        <select id="c-guru-sel" onchange="onGuruSel()"></select>
+        <input id="c-guru" placeholder="Taip nama guru…" autocomplete="off" style="display:none;margin-top:8px"></div>
     </div>
     <div class="modal-f">
       <button class="btn" onclick="closeCaseModal()">Batal</button>
@@ -701,6 +712,9 @@ const DEFAULT_API='https://script.google.com/macros/s/AKfycbxrypP6OHf0sJkUXcRS2b
 let CASES = load(LS_CASES, []);
 let SETTINGS = load(LS_SET, {nama:'Sekolah Kebangsaan Bandar Tawau',kod:'XBA3051',guru:'Harsidi bin Junick',sesi:'2025 / 2026',api:DEFAULT_API,pin:''});
 if(SETTINGS.api===undefined||SETTINGS.api==='')SETTINGS.api=DEFAULT_API;   // pastikan lalai pada peranti sedia ada
+const DEFAULT_GURU=['Harsidi bin Junick','Abbas Osman'];
+if(!Array.isArray(SETTINGS.guruList)||!SETTINGS.guruList.length)SETTINGS.guruList=DEFAULT_GURU.slice();
+else DEFAULT_GURU.forEach(n=>{if(!SETTINGS.guruList.includes(n))SETTINGS.guruList.push(n);});
 function load(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d;}catch(e){return d;}}
 function save(){localStorage.setItem(LS_CASES,JSON.stringify(CASES));localStorage.setItem(LS_SET,JSON.stringify(SETTINGS));}
 function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,6);}
@@ -807,6 +821,20 @@ function gatherPelaku(){
     nama:r.querySelector('.p-nama').value.trim(),
     jantina:r.querySelector('.p-jantina').value
   })).filter(p=>p.nama||p.kelas);
+}
+/* ---------- Guru Pelapor (senarai + tambah manual) ---------- */
+function fillGuruSelect(selected){
+  const s=document.getElementById('c-guru-sel'), inp=document.getElementById('c-guru');
+  const cur=selected||SETTINGS.guru||SETTINGS.guruList[0]||'';
+  let opts=SETTINGS.guruList.map(g=>`<option value="${esc(g)}">${esc(g)}</option>`).join('');
+  if(cur && !SETTINGS.guruList.includes(cur))opts+=`<option value="${esc(cur)}">${esc(cur)}</option>`;
+  opts+='<option value="__manual__">＋ Taip nama guru lain…</option>';
+  s.innerHTML=opts; s.value=cur; inp.value=cur; inp.style.display='none';
+}
+function onGuruSel(){
+  const s=document.getElementById('c-guru-sel'), inp=document.getElementById('c-guru');
+  if(s.value==='__manual__'){inp.style.display='';inp.value='';inp.placeholder='Taip nama guru…';inp.focus();return;}
+  inp.value=s.value; inp.style.display='none';
 }
 let CLOUD_INFO=null;
 async function openCloud(which){
@@ -1109,7 +1137,7 @@ function openCaseModal(id){
     document.getElementById('c-tarikh').value=c.tarikh;
     document.getElementById('c-kategori').value=c.kategori;document.getElementById('c-tahap').value=c.tahap;
     document.getElementById('c-butiran').value=c.butiran;document.getElementById('c-tindakan').value=c.tindakan||'';
-    document.getElementById('c-guru').value=c.guru||SETTINGS.guru;document.getElementById('c-status').value=c.status;
+    document.getElementById('c-status').value=c.status;fillGuruSelect(c.guru||SETTINGS.guru);
     addPelaku({kelas:c.kelas,nama:c.nama,jantina:c.jantina});
     addBtn.style.display='none';   // kemaskini = seorang pelaku
     const _u=String(c.foto||'').split('\n').filter(Boolean), _i=String(c.fotoId||'').split('\n');
@@ -1121,7 +1149,7 @@ function openCaseModal(id){
     document.getElementById('c-tarikh').value=new Date().toISOString().slice(0,10);
     document.getElementById('c-kategori').selectedIndex=0;
     document.getElementById('c-tahap').value='Ringan';
-    document.getElementById('c-guru').value=SETTINGS.guru;document.getElementById('c-status').value='Dilaporkan';
+    document.getElementById('c-status').value='Dilaporkan';fillGuruSelect(SETTINGS.guru);
     addPelaku();
     addBtn.style.display='';
     renderFotoGallery();
@@ -1163,6 +1191,7 @@ async function saveCase(){
   const pelaku=gatherPelaku();
   if(!tarikh||!kategori||!butiran||!pelaku.length){toast('Sila lengkapkan medan bertanda *');return;}
   if(pelaku.some(p=>!p.nama||!p.kelas)){toast('Setiap pelaku perlukan kelas & nama');return;}
+  if(shared.guru && !SETTINGS.guruList.includes(shared.guru)){SETTINGS.guruList.push(shared.guru);save();if(typeof renderGuruChips==='function')renderGuruChips();}
   // foto: kekalkan sedia ada (ada id), muat naik yang baharu (ada data)
   const cloud=CLOUD();
   const keepUrls=fotoItems.filter(it=>it.id).map(it=>it.url);
@@ -1279,6 +1308,19 @@ function exportCSV(){
 
 /* ====================== SETTINGS / DATA ====================== */
 function val(id){return document.getElementById(id).value.trim();}
+function renderGuruChips(){
+  const el=document.getElementById('guruChips');if(!el)return;
+  el.innerHTML=SETTINGS.guruList.map((g,i)=>`<span class="chip" style="cursor:default;display:inline-flex;align-items:center;gap:6px">${esc(g)}<span onclick="removeGuru(${i})" title="Buang" style="cursor:pointer;color:var(--red);font-weight:700">×</span></span>`).join('');
+}
+function addGuru(){
+  const v=document.getElementById('guruNew').value.trim();if(!v)return;
+  if(!SETTINGS.guruList.includes(v))SETTINGS.guruList.push(v);
+  save();document.getElementById('guruNew').value='';renderGuruChips();toast('Guru ditambah');
+}
+function removeGuru(i){
+  if(SETTINGS.guruList.length<=1){toast('Sekurang-kurangnya satu nama diperlukan');return;}
+  SETTINGS.guruList.splice(i,1);save();renderGuruChips();
+}
 function saveSettings(connect){
   SETTINGS={nama:val('set-nama'),kod:val('set-kod'),guru:val('set-guru'),sesi:val('set-sesi'),api:val('set-api'),pin:val('set-pin')};save();
   document.querySelector('.brand-txt p').textContent=(SETTINGS.nama.replace('Sekolah Kebangsaan','SK')+' · '+SETTINGS.kod).toUpperCase();
@@ -1327,6 +1369,7 @@ function initAll(){
   document.getElementById('set-api').value=SETTINGS.api||'';document.getElementById('set-pin').value=SETTINGS.pin||'';
   document.querySelector('.brand-txt p').textContent=(SETTINGS.nama.replace('Sekolah Kebangsaan','SK')+' · '+SETTINGS.kod).toUpperCase();
   document.getElementById('foot-guru').textContent=SETTINGS.guru;
+  renderGuruChips();
   initGuide();
   if(CLOUD()){cloudLoad();}else{setMode('offline');renderDashboard();renderRecords();}
 }
