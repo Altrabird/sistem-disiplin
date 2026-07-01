@@ -213,14 +213,30 @@ tbody tr:hover{background:var(--surface-2);}
 @keyframes blink{50%{opacity:.3}}
 
 /* ===== photo upload ===== */
-.foto-zone{display:flex;gap:14px;align-items:flex-start;flex-wrap:wrap;}
-.foto-drop{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;width:150px;height:118px;border:2px dashed var(--line);border-radius:var(--r-sm);color:var(--ink-2);font-size:12px;font-weight:600;cursor:pointer;transition:.16s;text-align:center;padding:8px;background:var(--surface-2);}
+.foto-zone{display:block;}
+.foto-drop{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:9px;width:100%;min-height:134px;border:2px dashed var(--line);border-radius:var(--r-sm);color:var(--ink-2);font-size:13px;font-weight:600;cursor:pointer;transition:.16s;text-align:center;padding:18px;background:var(--surface-2);}
 .foto-drop:hover{border-color:var(--brand-2);color:var(--brand);background:var(--blue-bg);}
-.foto-drop .ic{width:26px;height:26px;}
-.foto-prev{position:relative;width:150px;height:118px;border-radius:var(--r-sm);overflow:hidden;border:1px solid var(--line);}
-.foto-prev img{width:100%;height:100%;object-fit:cover;display:block;}
-.foto-rm{position:absolute;top:6px;right:6px;width:26px;height:26px;border-radius:7px;border:none;background:rgba(15,23,42,.72);color:#fff;display:flex;align-items:center;justify-content:center;}
+.foto-drop .ic{width:32px;height:32px;}
+.foto-prev{position:relative;width:100%;max-width:320px;margin:0 auto;min-height:120px;border-radius:var(--r-sm);overflow:hidden;border:1px solid var(--line);background:#0f172a;display:flex;align-items:center;justify-content:center;}
+.foto-prev img{max-width:100%;max-height:280px;object-fit:contain;display:block;}
+.foto-rm{position:absolute;top:8px;right:8px;width:28px;height:28px;border-radius:7px;border:none;background:rgba(15,23,42,.72);color:#fff;display:flex;align-items:center;justify-content:center;}
 .foto-rm:hover{background:var(--red);} .foto-rm .ic{width:15px;height:15px;}
+
+/* pelaku (berbilang) */
+.pelaku-section > label{display:block;font-size:12.5px;font-weight:600;margin-bottom:9px;}
+.pelaku-count{font-family:var(--mono);font-size:11px;color:var(--brand);background:var(--blue-bg);padding:2px 9px;border-radius:20px;font-weight:600;margin-left:5px;}
+#pelakuList{counter-reset:pel;}
+.pelaku-row{display:flex;align-items:flex-start;gap:10px;background:var(--surface-2);border:1px solid var(--line);border-radius:var(--r-sm);padding:12px;margin-bottom:10px;}
+.pelaku-num{width:24px;height:24px;border-radius:7px;background:var(--brand);color:#fff;font-family:var(--mono);font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:23px;}
+.pelaku-num::before{counter-increment:pel;content:counter(pel);}
+.pelaku-grid{flex:1;display:grid;grid-template-columns:1fr 1.3fr .8fr;gap:10px;min-width:0;}
+@media(max-width:620px){.pelaku-grid{grid-template-columns:1fr;}}
+.pf label{display:block;font-size:11px;font-weight:600;margin-bottom:5px;color:var(--ink-2);}
+.pf input,.pf select{width:100%;padding:9px 10px;border:1px solid var(--line);border-radius:8px;background:var(--surface);font-size:13px;transition:border-color .15s;}
+.pf input:focus,.pf select:focus{outline:none;border-color:var(--brand-2);box-shadow:0 0 0 3px rgba(59,130,246,.16);}
+.pelaku-rm{width:28px;height:28px;border-radius:7px;border:1px solid var(--line);background:var(--surface);color:var(--ink-2);font-size:17px;line-height:1;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:22px;}
+.pelaku-rm:hover{border-color:var(--red);color:var(--red);background:var(--red-bg);}
+.pelaku-add{margin-top:2px;}
 .thumb{width:40px;height:40px;border-radius:8px;object-fit:cover;border:1px solid var(--line);cursor:pointer;transition:.15s;display:block;}
 .thumb:hover{transform:scale(1.06);border-color:var(--brand-2);}
 .no-thumb{color:var(--ink-3);} .no-thumb .ic{width:18px;height:18px;}
@@ -560,37 +576,37 @@ svg circle[data-tt],svg [data-drill]{cursor:pointer;}
     <div class="modal-b">
       <input type="hidden" id="c-id">
       <div class="form-grid">
-        <div class="field"><label>Kelas <span class="req">*</span></label><input id="c-kelas" list="kelasList" placeholder="Pilih kelas…" autocomplete="off"><datalist id="kelasList"></datalist></div>
-        <div class="field"><label>Nama Murid <span class="req">*</span></label>
-          <select id="c-nama-sel" style="display:none" onchange="onNamaSel()"></select>
-          <input id="c-nama" list="namaList" placeholder="Pilih kelas dahulu…" autocomplete="off"><datalist id="namaList"></datalist>
-          <div class="hint" id="c-nama-hint"></div></div>
-        <div class="field"><label>Jantina</label><select id="c-jantina"><option>Lelaki</option><option>Perempuan</option></select></div>
         <div class="field"><label>Tarikh Kejadian <span class="req">*</span></label><input type="date" id="c-tarikh"></div>
         <div class="field"><label>Kategori Salah Laku <span class="req">*</span></label><select id="c-kategori" onchange="onKategoriPick()"></select></div>
         <div class="field"><label>Tahap Keseriusan</label><select id="c-tahap"><option>Ringan</option><option>Sederhana</option><option>Berat</option></select></div>
-        <div class="field full"><label>Butiran Kejadian <span class="req">*</span></label><textarea id="c-butiran" placeholder="Huraikan apa yang berlaku, lokasi, masa, saksi..."></textarea></div>
-        <div class="field full"><label>Tindakan Diambil</label><textarea id="c-tindakan" placeholder="Tindakan yang telah / akan diambil"></textarea><div class="hint" id="c-cadangan"></div></div>
-        <div class="field full"><label>Foto Bukti <span style="color:var(--ink-3);font-weight:400">(pilihan)</span></label>
-          <div class="foto-zone" id="fotoZone">
-            <label class="foto-drop" id="fotoDrop">
-              <svg class="ic"><use href="#i-camera"/></svg>
-              <span>Ambil gambar / pilih fail</span>
-              <input type="file" id="c-foto" accept="image/*" capture="environment" style="display:none" onchange="onFotoPick(event)">
-            </label>
-            <div class="foto-prev" id="fotoPrev" style="display:none">
-              <img id="fotoImg" alt="Foto bukti">
-              <button type="button" class="foto-rm" title="Buang foto" onclick="removeFoto()"><svg class="ic"><use href="#i-x"/></svg></button>
-            </div>
-          </div>
-        </div>
-        <div class="field"><label>Guru Pelapor</label><input id="c-guru" placeholder="Nama guru"></div>
         <div class="field"><label>Status</label><select id="c-status"><option>Dilaporkan</option><option>Dalam Tindakan</option><option>Selesai</option></select></div>
       </div>
+      <div class="field full pelaku-section">
+        <label>Pelaku Terlibat <span class="req">*</span> <span id="pelakuCount" class="pelaku-count"></span></label>
+        <datalist id="kelasList"></datalist>
+        <div id="pelakuList"></div>
+        <button type="button" class="btn sm pelaku-add" id="addPelakuBtn" onclick="addPelaku()"><svg class="ic"><use href="#i-plus"/></svg> Tambah Pelaku</button>
+      </div>
+      <div class="field full"><label>Butiran Kejadian <span class="req">*</span></label><textarea id="c-butiran" placeholder="Huraikan apa yang berlaku, lokasi, masa, saksi..."></textarea></div>
+      <div class="field full"><label>Tindakan Diambil</label><textarea id="c-tindakan" placeholder="Tindakan yang telah / akan diambil"></textarea><div class="hint" id="c-cadangan"></div></div>
+      <div class="field full"><label>Foto Bukti <span style="color:var(--ink-3);font-weight:400">(pilihan)</span></label>
+        <div class="foto-zone" id="fotoZone">
+          <label class="foto-drop" id="fotoDrop">
+            <svg class="ic"><use href="#i-camera"/></svg>
+            <span>Ambil gambar / pilih fail</span>
+            <input type="file" id="c-foto" accept="image/*" capture="environment" style="display:none" onchange="onFotoPick(event)">
+          </label>
+          <div class="foto-prev" id="fotoPrev" style="display:none">
+            <img id="fotoImg" alt="Foto bukti">
+            <button type="button" class="foto-rm" title="Buang foto" onclick="removeFoto()"><svg class="ic"><use href="#i-x"/></svg></button>
+          </div>
+        </div>
+      </div>
+      <div class="field full"><label>Guru Pelapor</label><input id="c-guru" placeholder="Nama guru"></div>
     </div>
     <div class="modal-f">
       <button class="btn" onclick="closeCaseModal()">Batal</button>
-      <button class="btn primary" onclick="saveCase()"><svg class="ic"><use href="#i-check"/></svg> Simpan Kes</button>
+      <button class="btn primary" id="saveCaseBtn" onclick="saveCase()"><svg class="ic"><use href="#i-check"/></svg> Simpan Kes</button>
     </div>
   </div>
 </div>
@@ -717,28 +733,73 @@ function applyRoster(){
   const info=document.getElementById('rosterInfo');
   if(info)info.innerHTML=`<svg class="ic"><use href="#i-check"/></svg><span><b>${ROSTER.length} murid</b> dimuatkan dari roster Hadir@SKBT (${kelas.length} kelas). Dalam borang kes: pilih kelas dahulu, kemudian pilih nama murid.</span>`;
 }
-function onKelasPick(){
-  const kelas=document.getElementById('c-kelas').value.trim();
-  const hint=document.getElementById('c-nama-hint'), nameInput=document.getElementById('c-nama'), sel=document.getElementById('c-nama-sel');
+/* ---------- Pelaku (boleh lebih dari 1 untuk kes yang sama) ---------- */
+let pelakuSeq=0;
+function pelakuRowHTML(uid){
+  return `<div class="pelaku-row" data-uid="${uid}">
+    <span class="pelaku-num"></span>
+    <div class="pelaku-grid">
+      <div class="pf"><label>Kelas *</label><input class="p-kelas" list="kelasList" placeholder="Pilih kelas…" autocomplete="off" oninput="onPelakuKelas(this)" onchange="onPelakuKelas(this)"></div>
+      <div class="pf"><label>Nama Murid *</label><select class="p-nama-sel" style="display:none" onchange="onPelakuNamaSel(this)"></select><input class="p-nama" placeholder="Pilih kelas dahulu…" autocomplete="off" oninput="showCadangan()"></div>
+      <div class="pf"><label>Jantina</label><select class="p-jantina"><option>Lelaki</option><option>Perempuan</option></select></div>
+    </div>
+    <button type="button" class="pelaku-rm" onclick="removePelaku(this)" title="Buang pelaku">×</button>
+  </div>`;
+}
+function addPelaku(data){
+  const list=document.getElementById('pelakuList');
+  list.insertAdjacentHTML('beforeend',pelakuRowHTML(++pelakuSeq));
+  const row=list.lastElementChild;
+  if(data){
+    row.querySelector('.p-kelas').value=data.kelas||'';
+    row.querySelector('.p-jantina').value=data.jantina||'Lelaki';
+    row.querySelector('.p-nama').value=data.nama||'';
+    onPelakuKelas(row.querySelector('.p-kelas'));
+  }
+  updatePelakuUI();
+}
+function removePelaku(btn){
+  const list=document.getElementById('pelakuList');
+  if(list.querySelectorAll('.pelaku-row').length<=1){toast('Sekurang-kurangnya seorang pelaku diperlukan');return;}
+  btn.closest('.pelaku-row').remove();
+  updatePelakuUI(); showCadangan();
+}
+function updatePelakuUI(){
+  const rows=document.querySelectorAll('#pelakuList .pelaku-row');
+  rows.forEach(r=>r.querySelector('.pelaku-rm').style.display=rows.length>1?'':'none');
+  const c=document.getElementById('pelakuCount');if(c)c.textContent=rows.length>1?rows.length+' pelaku':'';
+}
+function onPelakuKelas(input){
+  const row=input.closest('.pelaku-row'), kelas=input.value.trim();
+  const sel=row.querySelector('.p-nama-sel'), nameInput=row.querySelector('.p-nama');
   if(ROSTER.length && kelas){
     const studs=ROSTER.filter(s=>s.kelas.toLowerCase()===kelas.toLowerCase());
     if(studs.length){
       const cur=nameInput.value.trim();
       let opts='<option value="">— Pilih nama murid —</option>';
-      if(cur && !studs.some(s=>s.nama===cur)) opts+=`<option value="${esc(cur)}">${esc(cur)} (luar roster)</option>`;
+      if(cur && !studs.some(s=>s.nama===cur))opts+=`<option value="${esc(cur)}">${esc(cur)} (luar roster)</option>`;
       opts+=studs.map(s=>`<option value="${esc(s.nama)}">${esc(s.nama)}</option>`).join('');
       opts+='<option value="__manual__">＋ Taip nama lain…</option>';
       sel.innerHTML=opts; sel.value=cur||''; nameInput.value=sel.value;
       sel.style.display=''; nameInput.style.display='none';
-      if(hint)hint.innerHTML=`<svg class="ic" style="width:13px;height:13px;color:var(--green)"><use href="#i-users"/></svg> ${studs.length} murid dalam kelas <b>${esc(kelas)}</b>`;
       showCadangan(); return;
     }
   }
-  // fallback: taip manual (luar talian, atau kelas tiada dalam roster)
   sel.style.display='none'; nameInput.style.display='';
-  nameInput.placeholder = !ROSTER.length ? 'Nama penuh murid' : (kelas?'Taip nama murid…':'Pilih kelas dahulu…');
-  if(hint)hint.innerHTML = (ROSTER.length && kelas) ? '<span style="color:var(--amber)">Kelas tiada dalam roster — taip nama secara manual</span>' : '';
+  nameInput.placeholder=!ROSTER.length?'Nama penuh murid':(kelas?'Taip nama murid…':'Pilih kelas dahulu…');
   showCadangan();
+}
+function onPelakuNamaSel(sel){
+  const row=sel.closest('.pelaku-row'), nameInput=row.querySelector('.p-nama');
+  if(sel.value==='__manual__'){sel.style.display='none';nameInput.style.display='';nameInput.value='';nameInput.placeholder='Taip nama murid…';nameInput.focus();showCadangan();return;}
+  nameInput.value=sel.value; showCadangan();
+}
+function gatherPelaku(){
+  return [...document.querySelectorAll('#pelakuList .pelaku-row')].map(r=>({
+    kelas:r.querySelector('.p-kelas').value.trim(),
+    nama:r.querySelector('.p-nama').value.trim(),
+    jantina:r.querySelector('.p-jantina').value
+  })).filter(p=>p.nama||p.kelas);
 }
 let CLOUD_INFO=null;
 async function openCloud(which){
@@ -748,15 +809,25 @@ async function openCloud(which){
     if(u)window.open(u,'_blank');else toast('Pautan tidak tersedia');
   }catch(e){toast('Kemas kini Code.gs & deploy versi baharu untuk guna butang ini');}
 }
-function onNamaSel(){
-  const sel=document.getElementById('c-nama-sel'), nameInput=document.getElementById('c-nama');
-  if(sel.value==='__manual__'){sel.style.display='none';nameInput.style.display='';nameInput.value='';nameInput.placeholder='Taip nama murid…';nameInput.focus();showCadangan();return;}
-  nameInput.value=sel.value; showCadangan();
-}
+/* onNamaSel digantikan oleh onPelakuNamaSel (borang berbilang pelaku) */
 
 /* ---------- Foto: mampatan & lightbox ---------- */
 let pendingFoto=null, removeExisting=false;
-function compressImage(file,maxDim=1280,quality=0.72){
+async function compressImage(file,maxDim=1280,quality=0.72){
+  // createImageBitmap menghormati orientasi EXIF → foto tidak senget/terbalik
+  if(window.createImageBitmap){
+    try{
+      let bmp;
+      try{bmp=await createImageBitmap(file,{imageOrientation:'from-image'});}
+      catch(_){bmp=await createImageBitmap(file);}
+      let w=bmp.width,h=bmp.height;
+      if(w>h&&w>maxDim){h=Math.round(h*maxDim/w);w=maxDim;}else if(h>maxDim){w=Math.round(w*maxDim/h);h=maxDim;}
+      const cv=document.createElement('canvas');cv.width=w;cv.height=h;
+      cv.getContext('2d').drawImage(bmp,0,0,w,h);
+      if(bmp.close)bmp.close();
+      return cv.toDataURL('image/jpeg',quality);
+    }catch(e){/* jatuh ke kaedah lama */}
+  }
   return new Promise((res,rej)=>{
     const rd=new FileReader();
     rd.onload=()=>{const img=new Image();
@@ -1001,61 +1072,89 @@ function openCaseModal(id){
   document.getElementById('caseOverlay').classList.add('show');
   const t=document.getElementById('modalTitle');
   pendingFoto=null;removeExisting=false;
-  document.getElementById('c-nama-hint').textContent='';
+  document.getElementById('pelakuList').innerHTML='';
+  const addBtn=document.getElementById('addPelakuBtn');
   if(id){
     const c=CASES.find(x=>String(x.id)===String(id));if(!c)return;
     t.innerHTML=ico('edit')+' Kemaskini Kes';
     document.getElementById('c-id').value=c.id;
-    document.getElementById('c-nama').value=c.nama;document.getElementById('c-kelas').value=c.kelas;
-    document.getElementById('c-jantina').value=c.jantina||'Lelaki';document.getElementById('c-tarikh').value=c.tarikh;
+    document.getElementById('c-tarikh').value=c.tarikh;
     document.getElementById('c-kategori').value=c.kategori;document.getElementById('c-tahap').value=c.tahap;
     document.getElementById('c-butiran').value=c.butiran;document.getElementById('c-tindakan').value=c.tindakan||'';
     document.getElementById('c-guru').value=c.guru||SETTINGS.guru;document.getElementById('c-status').value=c.status;
+    addPelaku({kelas:c.kelas,nama:c.nama,jantina:c.jantina});
+    addBtn.style.display='none';   // kemaskini = seorang pelaku
     renderFotoPreview(c.foto||null);
   }else{
     t.innerHTML=ico('records')+' Rekod Kes Baharu';
-    ['c-id','c-nama','c-kelas','c-butiran','c-tindakan'].forEach(i=>document.getElementById(i).value='');
-    document.getElementById('c-jantina').value='Lelaki';
+    ['c-id','c-butiran','c-tindakan'].forEach(i=>document.getElementById(i).value='');
     document.getElementById('c-tarikh').value=new Date().toISOString().slice(0,10);
     document.getElementById('c-kategori').selectedIndex=0;
+    document.getElementById('c-tahap').value='Ringan';
     document.getElementById('c-guru').value=SETTINGS.guru;document.getElementById('c-status').value='Dilaporkan';
+    addPelaku();
+    addBtn.style.display='';
     renderFotoPreview(null);
     onKategoriPick();
   }
-  onKelasPick();
+  document.getElementById('c-cadangan').innerHTML='';
+  showCadangan();
 }
 function closeCaseModal(){document.getElementById('caseOverlay').classList.remove('show');}
 function onKategoriPick(){const k=katObj(document.getElementById('c-kategori').value);if(k)document.getElementById('c-tahap').value=k.def;showCadangan();}
 function showCadangan(){
-  const id=document.getElementById('c-kategori').value, tahap=document.getElementById('c-tahap').value;
-  const f=freqFor(document.getElementById('c-nama').value,document.getElementById('c-kelas').value,document.getElementById('c-id').value);
-  const r=cadangTindakan(id,tahap,f), all=[...r.mandat,...r.langkah];
-  document.getElementById('c-cadangan').innerHTML = all.length?
-    `<b>Cadangan tindakan</b> (kali ke-${f}): `+all.slice(0,3).map(x=>esc(x)).join(' · ')+` <a href="#" onclick="closeCaseModal();go('guide');return false">Lihat penuh →</a>`:'';
+  const el=document.getElementById('c-cadangan');if(!el)return;
+  const id=document.getElementById('c-kategori').value, tahap=document.getElementById('c-tahap').value, cid=document.getElementById('c-id').value;
+  let maxF=1;
+  document.querySelectorAll('#pelakuList .pelaku-row').forEach(r=>{
+    const nama=r.querySelector('.p-nama').value, kelas=r.querySelector('.p-kelas').value;
+    if(nama&&kelas){const f=freqFor(nama,kelas,cid);if(f>maxF)maxF=f;}
+  });
+  const r=cadangTindakan(id,tahap,maxF), all=[...r.mandat,...r.langkah];
+  el.innerHTML = all.length?
+    `<b>Cadangan tindakan</b> (kali ke-${maxF}): `+all.slice(0,3).map(x=>esc(x)).join(' · ')+` <a href="#" onclick="closeCaseModal();go('guide');return false">Lihat penuh →</a>`:'';
+}
+async function persistRecord(obj,fotoData){
+  if(CLOUD()){
+    const res=await apiPost({action:'save',record:obj,fotoData:fotoData||null});
+    if(!res.ok)throw new Error(res.error||'ralat');
+    upsert(res.data);return res.data;
+  }
+  if(fotoData){obj.foto=fotoData;obj.fotoId='';}
+  const i=CASES.findIndex(x=>String(x.id)===String(obj.id));
+  if(i>-1)CASES[i]={...CASES[i],...obj};else{if(!obj.dicipta)obj.dicipta=new Date().toISOString();CASES.push(obj);}
+  return obj;
 }
 async function saveCase(){
-  const nama=document.getElementById('c-nama').value.trim(), kelas=document.getElementById('c-kelas').value.trim();
-  const tarikh=document.getElementById('c-tarikh').value, kategori=document.getElementById('c-kategori').value, butiran=document.getElementById('c-butiran').value.trim();
-  if(!nama||!kelas||!tarikh||!butiran){toast('Sila lengkapkan medan bertanda *');return;}
+  const tarikh=document.getElementById('c-tarikh').value, kategori=document.getElementById('c-kategori').value;
+  const butiran=document.getElementById('c-butiran').value.trim();
+  const shared={tarikh,kategori,tahap:document.getElementById('c-tahap').value,butiran,
+    tindakan:document.getElementById('c-tindakan').value.trim(),guru:document.getElementById('c-guru').value.trim(),
+    status:document.getElementById('c-status').value};
+  const pelaku=gatherPelaku();
+  if(!tarikh||!kategori||!butiran||!pelaku.length){toast('Sila lengkapkan medan bertanda *');return;}
+  if(pelaku.some(p=>!p.nama||!p.kelas)){toast('Setiap pelaku perlukan kelas & nama');return;}
   const id=document.getElementById('c-id').value, existing=id?CASES.find(x=>String(x.id)===String(id)):null;
-  const obj={id:id||uid(),nama,kelas,jantina:document.getElementById('c-jantina').value,tarikh,kategori,tahap:document.getElementById('c-tahap').value,butiran,tindakan:document.getElementById('c-tindakan').value.trim(),guru:document.getElementById('c-guru').value.trim(),status:document.getElementById('c-status').value};
-  // foto
-  if(removeExisting){obj.foto='';obj.fotoId='';}
-  else if(existing){obj.foto=existing.foto||'';obj.fotoId=existing.fotoId||'';}
-  if(CLOUD()){
-    const btn=event&&event.target?event.target.closest('button'):null;if(btn){btn.disabled=true;btn.style.opacity=.6;}
-    try{
-      const res=await apiPost({action:'save',record:obj,fotoData:pendingFoto||null});
-      if(!res.ok)throw new Error(res.error||'ralat');
-      upsert(res.data);save();toast(id?'Kes dikemaskini (awan)':'Kes baharu disimpan (awan)');
-    }catch(e){toast('Gagal simpan ke awan: '+e.message);if(btn){btn.disabled=false;btn.style.opacity=1;}return;}
-    if(btn){btn.disabled=false;btn.style.opacity=1;}
-  }else{
-    if(pendingFoto){obj.foto=pendingFoto;obj.fotoId='';}
-    if(id){const i=CASES.findIndex(x=>String(x.id)===String(id));CASES[i]={...CASES[i],...obj};}
-    else{obj.dicipta=new Date().toISOString();CASES.push(obj);}
-    save();toast(id?'Kes dikemaskini':'Kes baharu direkodkan');
-  }
+  const btn=document.getElementById('saveCaseBtn');if(btn){btn.disabled=true;btn.style.opacity=.6;}
+  try{
+    if(id){
+      const p=pelaku[0];
+      const obj={id,kesId:(existing&&existing.kesId)||id,...shared,nama:p.nama,kelas:p.kelas,jantina:p.jantina};
+      if(removeExisting){obj.foto='';obj.fotoId='';}
+      else if(!pendingFoto&&existing){obj.foto=existing.foto||'';obj.fotoId=existing.fotoId||'';}
+      await persistRecord(obj,pendingFoto||null);
+      toast('Kes dikemaskini');
+    }else{
+      const kesId=uid();
+      for(const p of pelaku){
+        const obj={id:uid(),kesId,...shared,nama:p.nama,kelas:p.kelas,jantina:p.jantina};
+        await persistRecord(obj,pendingFoto||null);
+      }
+      toast(pelaku.length>1?pelaku.length+' pelaku direkodkan':'Kes baharu direkodkan');
+    }
+    save();
+  }catch(e){toast('Gagal simpan: '+e.message);if(btn){btn.disabled=false;btn.style.opacity=1;}return;}
+  if(btn){btn.disabled=false;btn.style.opacity=1;}
   closeCaseModal();renderRecords();renderDashboard();renderRisiko();
 }
 async function delCase(id){
@@ -1195,9 +1294,6 @@ function initAll(){
   if(CLOUD()){cloudLoad();}else{setMode('offline');renderDashboard();renderRecords();}
 }
 document.getElementById('c-tahap').addEventListener('change',showCadangan);
-document.getElementById('c-nama').addEventListener('input',showCadangan);
-document.getElementById('c-kelas').addEventListener('input',onKelasPick);
-document.getElementById('c-kelas').addEventListener('change',onKelasPick);
 ['caseOverlay','guideOverlay','riskOverlay'].forEach(id=>document.getElementById(id).addEventListener('click',e=>{if(e.target.id===id)e.currentTarget.classList.remove('show');}));
 document.addEventListener('keydown',e=>{if(e.key==='Escape')document.querySelectorAll('.overlay.show').forEach(o=>o.classList.remove('show'));});
 // hover tooltip + click-to-drill untuk semua carta
