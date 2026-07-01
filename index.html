@@ -92,8 +92,9 @@ a{color:var(--brand-2);text-decoration:none;}
 
 /* ===== Bars / charts ===== */
 .barlist{display:flex;flex-direction:column;gap:13px;}
-.barrow{display:grid;grid-template-columns:150px 1fr 38px;align-items:center;gap:13px;}
-.barrow .nm{font-size:12.5px;color:var(--ink);display:flex;align-items:center;gap:8px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;}
+.barrow{display:grid;grid-template-columns:172px 1fr 34px;align-items:center;gap:13px;}
+.barrow .nm{font-size:12px;color:var(--ink);display:flex;align-items:center;gap:8px;min-width:0;line-height:1.25;}
+.barrow .nm > span{min-width:0;white-space:normal;overflow-wrap:anywhere;}
 .bartrack{height:9px;background:var(--line-2);border-radius:6px;overflow:hidden;}
 .barfill{height:100%;border-radius:6px;background:linear-gradient(90deg,var(--brand),var(--brand-2));transition:width .7s cubic-bezier(.4,0,.2,1);min-width:3px;}
 .barrow .vl{font-size:13px;font-weight:600;text-align:right;font-family:var(--mono);color:var(--ink);}
@@ -906,7 +907,7 @@ function renderDashboard(){
   const maxK=Math.max(1,...katRows.map(r=>r[1]));
   document.getElementById('chart-kategori').innerHTML = katRows.length?katRows.map(([id,n])=>{
     const col=sevColor(katObj(id).def);
-    return `<div class="barrow clickable" data-tt="${esc(katName(id))}" data-ts="${n} kes · ${pct(n,tot)}% · klik untuk senarai" data-drill='{"t":"rec","o":{"kategori":"${id}"}}'><div class="nm">${katBadge(id)}${esc(katName(id))}</div><div class="bartrack"><div class="barfill" style="width:${n/maxK*100}%;background:linear-gradient(90deg,${col},${col})"></div></div><div class="vl">${n}</div></div>`;}).join('') : emptyMini();
+    return `<div class="barrow clickable" data-tt="${esc(katName(id))}" data-ts="${n} kes · ${pct(n,tot)}% · klik untuk senarai" data-drill='{"t":"rec","o":{"kategori":"${id}"}}'><div class="nm">${katBadge(id)}<span>${esc(katName(id))}</span></div><div class="bartrack"><div class="barfill" style="width:${n/maxK*100}%;background:linear-gradient(90deg,${col},${col})"></div></div><div class="vl">${n}</div></div>`;}).join('') : emptyMini();
 
   const sev={Ringan:0,Sederhana:0,Berat:0};CASES.forEach(c=>sev[c.tahap]=(sev[c.tahap]||0)+1);
   document.getElementById('chart-tahap').innerHTML = tot? donut([['Ringan',sev.Ringan,'#16a34a'],['Sederhana',sev.Sederhana,'#d97706'],['Berat',sev.Berat,'#dc2626']],tot) : emptyMini();
@@ -915,13 +916,13 @@ function renderDashboard(){
   const stc={Dilaporkan:'#2563eb','Dalam Tindakan':'#d97706',Selesai:'#16a34a'};
   const maxS=Math.max(1,...Object.values(st));
   document.getElementById('chart-status').innerHTML=Object.entries(st).map(([k,n])=>
-    `<div class="barrow clickable" data-tt="${esc(k)}" data-ts="${n} kes · ${pct(n,tot)}% · klik untuk senarai" data-drill='{"t":"rec","o":{"status":"${esc(k)}"}}'><div class="nm">${k}</div><div class="bartrack"><div class="barfill" style="width:${n/maxS*100}%;background:${stc[k]}"></div></div><div class="vl">${n}</div></div>`).join('');
+    `<div class="barrow clickable" data-tt="${esc(k)}" data-ts="${n} kes · ${pct(n,tot)}% · klik untuk senarai" data-drill='{"t":"rec","o":{"status":"${esc(k)}"}}'><div class="nm"><span>${k}</span></div><div class="bartrack"><div class="barfill" style="width:${n/maxS*100}%;background:${stc[k]}"></div></div><div class="vl">${n}</div></div>`).join('');
 
   const byKls={};CASES.forEach(c=>byKls[c.kelas]=(byKls[c.kelas]||0)+1);
   const klsRows=Object.entries(byKls).sort((a,b)=>b[1]-a[1]).slice(0,8);
   const maxKl=Math.max(1,...klsRows.map(r=>r[1]));
   document.getElementById('chart-kelas').innerHTML=klsRows.length?klsRows.map(([k,n])=>
-    `<div class="barrow clickable" data-tt="Kelas ${esc(k)}" data-ts="${n} kes · klik untuk senarai" data-drill='{"t":"rec","o":{"search":"${esc(k)}"}}'><div class="nm">${esc(k)}</div><div class="bartrack"><div class="barfill" style="width:${n/maxKl*100}%;background:linear-gradient(90deg,#1e40af,#3b82f6)"></div></div><div class="vl">${n}</div></div>`).join(''):emptyMini();
+    `<div class="barrow clickable" data-tt="Kelas ${esc(k)}" data-ts="${n} kes · klik untuk senarai" data-drill='{"t":"rec","o":{"search":"${esc(k)}"}}'><div class="nm"><span>${esc(k)}</span></div><div class="bartrack"><div class="barfill" style="width:${n/maxKl*100}%;background:linear-gradient(90deg,#1e40af,#3b82f6)"></div></div><div class="vl">${n}</div></div>`).join(''):emptyMini();
 
   const mon=Array(12).fill(0);CASES.forEach(c=>{const d=new Date(c.tarikh);if(!isNaN(d))mon[d.getMonth()]++;});
   document.getElementById('chart-tren').innerHTML=lineChart(mon);
