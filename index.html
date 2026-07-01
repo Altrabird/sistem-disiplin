@@ -300,9 +300,12 @@ tbody tr:hover{background:var(--surface-2);}
 .pres-nav{position:fixed;top:50%;transform:translateY(-50%);width:52px;height:52px;border-radius:50%;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.28);color:#fff;font-size:30px;line-height:1;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:101;transition:background .15s;}
 .pres-nav:hover{background:rgba(255,255,255,.26);}
 .pres-nav.prev{left:26px;} .pres-nav.next{right:26px;}
-.pres-exit{position:fixed;top:22px;right:26px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.28);color:#fff;padding:9px 15px;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;z-index:101;display:inline-flex;align-items:center;gap:7px;}
-.pres-exit:hover{background:rgba(255,255,255,.26);}
-.pres-counter{position:fixed;top:26px;left:30px;color:#93c5fd;font-family:var(--mono);font-size:14px;z-index:101;}
+.pres-topbar{position:fixed;top:0;left:0;right:0;height:60px;display:flex;align-items:center;justify-content:space-between;padding:0 26px;z-index:101;}
+.pres-counter{color:#93c5fd;font-family:var(--mono);font-size:14px;}
+.pres-tb-actions{display:flex;gap:10px;}
+.pres-btn{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.28);color:#fff;padding:9px 15px;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:7px;transition:background .15s;}
+.pres-btn:hover{background:rgba(255,255,255,.26);}
+.pres-btn:disabled{opacity:.55;cursor:default;}
 .pres-dots{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);display:flex;gap:10px;z-index:101;}
 .pres-dot{width:11px;height:11px;border-radius:50%;background:rgba(255,255,255,.3);cursor:pointer;transition:.2s;}
 .pres-dot.on{background:#60a5fa;transform:scale(1.25);}
@@ -719,8 +722,13 @@ svg circle[data-tt],svg [data-drill]{cursor:pointer;}
 
 <!-- ===== PRESENTATION MODE ===== -->
 <div class="pres" id="presentation">
-  <div class="pres-counter" id="presCounter"></div>
-  <button class="pres-exit" onclick="exitPresentation()"><svg class="ic"><use href="#i-x"/></svg> Keluar (Esc)</button>
+  <div class="pres-topbar">
+    <span class="pres-counter" id="presCounter"></span>
+    <div class="pres-tb-actions">
+      <button class="pres-btn" id="presPptBtn" onclick="downloadPPT()"><svg class="ic"><use href="#i-download"/></svg> Muat Turun PPT</button>
+      <button class="pres-btn" onclick="exitPresentation()"><svg class="ic"><use href="#i-x"/></svg> Keluar (Esc)</button>
+    </div>
+  </div>
   <div class="pres-stage" id="presStage"></div>
   <button class="pres-nav prev" onclick="presGo(-1)" aria-label="Sebelum">&#8249;</button>
   <button class="pres-nav next" onclick="presGo(1)" aria-label="Seterusnya">&#8250;</button>
@@ -736,6 +744,7 @@ svg circle[data-tt],svg [data-drill]{cursor:pointer;}
       <textarea id="reportText" spellcheck="false" style="width:100%;min-height:440px;font-size:13px;line-height:1.7;font-family:'Fira Sans',sans-serif;padding:16px;border:1px solid var(--line);border-radius:12px;resize:vertical;background:var(--surface-2)"></textarea>
     </div>
     <div class="modal-f">
+      <button class="btn accent" onclick="downloadPPT()"><svg class="ic"><use href="#i-monitor"/></svg> Muat Turun PPT</button>
       <button class="btn" onclick="downloadReportText()"><svg class="ic"><use href="#i-download"/></svg> Muat Turun .txt</button>
       <button class="btn primary" onclick="copyReportText()"><svg class="ic"><use href="#i-copy"/></svg> Salin Teks</button>
     </div>
@@ -1458,12 +1467,7 @@ function generateReportText(){
   } else L.push('Data tren bulanan masih terhad.');
   L.push('');
   L.push('7. CADANGAN & TINDAKAN SUSULAN');
-  const rec=['Meneruskan program kesedaran disiplin dan penghayatan nilai murni secara berkala.'];
-  if(st.sev.Berat>0) rec.push('Membentangkan kes berat kepada Lembaga Disiplin dan mengambil tindakan mengikut pekeliling KPM yang berkuat kuasa.');
-  if(st.risk.length) rec.push('Menjalankan kaunseling dan pemantauan rapi terhadap murid berulang kes serta memaklumkan ibu bapa/penjaga.');
-  rec.push('Mengukuhkan kerjasama guru kelas, Unit HEM dan Unit Bimbingan & Kaunseling.');
-  rec.push('Merekod dan mengemas kini setiap kes dalam sistem bagi tujuan pemantauan dan pelaporan MOEIS/IDME.');
-  rec.forEach((r,i)=>L.push(`${i+1}. ${r}`));
+  reportRecs(st).forEach((r,i)=>L.push(`${i+1}. ${r}`));
   L.push('');
   L.push('8. PENUTUP');
   L.push(`Secara keseluruhan, pengurusan disiplin murid di ${S.nama} berada dalam keadaan terkawal dan sentiasa dipantau. Kerjasama semua pihak amat diperlukan bagi memastikan persekitaran pembelajaran yang selamat, harmoni dan kondusif.`);
@@ -1532,6 +1536,94 @@ function renderPres(){
   document.getElementById('presStage').innerHTML=PRES[PRESI]||'';
   document.getElementById('presCounter').textContent=(PRESI+1)+' / '+PRES.length;
   document.getElementById('presDots').innerHTML=PRES.map((_,i)=>`<span class="pres-dot ${i===PRESI?'on':''}" onclick="presGoto(${i})"></span>`).join('');
+}
+
+/* ====================== MUAT TURUN PPT (.pptx) ====================== */
+const PPTX_CDN='https://cdn.jsdelivr.net/npm/pptxgenjs@3.12.0/dist/pptxgen.bundle.js';
+function loadScript(src){return new Promise((res,rej)=>{if(window.PptxGenJS){res();return;}const s=document.createElement('script');s.src=src;s.onload=()=>res();s.onerror=()=>rej(new Error('load'));document.head.appendChild(s);});}
+async function logoDataUrl(){try{const r=await fetch('logo.png');const b=await r.blob();return await new Promise(res=>{const fr=new FileReader();fr.onload=()=>res(fr.result);fr.onerror=()=>res(null);fr.readAsDataURL(b);});}catch(e){return null;}}
+function reportRecs(st){
+  const rec=['Meneruskan program kesedaran disiplin dan penghayatan nilai murni secara berkala.'];
+  if(st.sev.Berat>0) rec.push('Membentangkan kes berat kepada Lembaga Disiplin dan mengambil tindakan mengikut pekeliling KPM yang berkuat kuasa.');
+  if(st.risk.length) rec.push('Menjalankan kaunseling dan pemantauan rapi terhadap murid berulang kes serta memaklumkan ibu bapa/penjaga.');
+  rec.push('Mengukuhkan kerjasama guru kelas, Unit HEM dan Unit Bimbingan & Kaunseling.');
+  rec.push('Merekod dan mengemas kini setiap kes dalam sistem bagi tujuan pemantauan dan pelaporan MOEIS/IDME.');
+  return rec;
+}
+function noteRingkasan(st){return `Daripada ${st.tot} kes, ${st.status.Selesai} selesai (${pctS(st.status.Selesai,st.tot)}%), ${st.status['Dalam Tindakan']} dalam tindakan, ${st.status.Dilaporkan} baharu dilaporkan. Tahap: ${st.sev.Ringan} Ringan, ${st.sev.Sederhana} Sederhana, ${st.sev.Berat} Berat.`;}
+function noteTahap(st){return st.sev.Berat>0?`${st.sev.Berat} kes berat memerlukan perhatian segera Lembaga Disiplin.`:'Majoriti kes pada tahap ringan/sederhana; teruskan pemantauan berkala.';}
+function noteKategori(st){const t=st.topKat.slice(0,3).map(([id,n])=>`${katName(id)} (${n})`);return t.length?`Kategori tertinggi: ${t.join(', ')}. Beri tumpuan program pencegahan & kesedaran.`:'';}
+function noteKelas(st){return st.topKls.length?`Kelas paling banyak kes: ${st.topKls[0][0]} (${st.topKls[0][1]} kes). Tingkatkan pemantauan guru kelas.`:'';}
+function noteTren(st){const a=st.mon.map((n,i)=>({n,i})).filter(x=>x.n>0);return a.length?trendPhrase(a):'Data tren bulanan masih terhad.';}
+function noteRisiko(st){return st.risk.length?`${st.risk.length} murid berulang kes; ${st.risk.filter(p=>p.level==='Kritikal'||p.level==='Tinggi').length} pada tahap Tinggi/Kritikal memerlukan pelan intervensi individu & kaunseling.`:'Tiada murid berulang kes — teruskan pemantauan.';}
+async function downloadPPT(){
+  const btn=document.getElementById('presPptBtn'); if(btn){btn.disabled=true;}
+  toast('Menyediakan PPT…');
+  try{await loadScript(PPTX_CDN);}catch(e){toast('Perlukan internet untuk jana PPT');if(btn)btn.disabled=false;return;}
+  try{
+    const st=computeStats(), S=SETTINGS, now=new Date();
+    const tarikh=now.getDate()+' '+BULAN[now.getMonth()]+' '+now.getFullYear();
+    const logo=await logoDataUrl();
+    const pptx=new PptxGenJS();
+    pptx.layout='LAYOUT_WIDE'; pptx.author=S.guru; pptx.company=S.nama; pptx.subject='Pengurusan Disiplin'; pptx.title='Rumusan Pengurusan Disiplin Murid';
+    const BRAND='1E40AF', INK='0F172A', INK2='475569';
+    const head=(sl,t)=>{sl.background={color:'FFFFFF'};sl.addShape(pptx.ShapeType.rect,{x:0.6,y:0.55,w:0.14,h:0.56,fill:{color:BRAND}});sl.addText(t,{x:0.92,y:0.45,w:11.8,h:0.72,fontSize:26,bold:true,color:'1E3A8A'});};
+    const hdr=t=>({text:t,options:{bold:true,color:'FFFFFF',fill:{color:BRAND},fontSize:14}});
+    // 1 COVER
+    let sl=pptx.addSlide(); sl.background={color:INK};
+    if(logo)sl.addImage({data:logo,x:5.9,y:0.7,w:1.55,h:1.65});
+    sl.addText('RUMUSAN PENGURUSAN DISIPLIN MURID',{x:0.5,y:2.7,w:12.33,h:0.9,fontSize:33,bold:true,color:'FFFFFF',align:'center'});
+    sl.addText(`${S.nama} (${S.kod})`,{x:0.5,y:3.65,w:12.33,h:0.5,fontSize:20,color:'93C5FD',align:'center'});
+    sl.addText(`Guru Disiplin: ${S.guru}   |   Sesi ${S.sesi}   |   ${tarikh}`,{x:0.5,y:4.3,w:12.33,h:0.4,fontSize:14,color:'CBD5E1',align:'center'});
+    [['Jumlah Kes',st.tot],['Murid Berulang',st.risk.length],['Kes Selesai',st.status.Selesai]].forEach((c,i)=>{const x=3.55+i*2.15;sl.addText([{text:String(c[1])+'\n',options:{fontSize:32,bold:true,color:'60A5FA'}},{text:c[0],options:{fontSize:11,color:'CBD5E1'}}],{x,y:5.15,w:2,h:1,align:'center'});});
+    sl.addNotes(generateReportText());
+    // 2 KPI
+    sl=pptx.addSlide(); head(sl,'Ringkasan Keseluruhan');
+    [['Jumlah Kes',st.tot,BRAND],['Selesai ('+pctS(st.status.Selesai,st.tot)+'%)',st.status.Selesai,'16A34A'],['Dalam Tindakan',st.status['Dalam Tindakan'],'D97706'],['Murid Berulang',st.risk.length,'DC2626']].forEach((b,i)=>{const x=0.6+i*3.05;sl.addShape(pptx.ShapeType.roundRect,{x,y:2.1,w:2.75,h:2.7,fill:{color:b[2]},rectRadius:0.12});sl.addText(String(b[1]),{x,y:2.4,w:2.75,h:1.4,fontSize:50,bold:true,color:'FFFFFF',align:'center'});sl.addText(b[0],{x:x+0.05,y:3.8,w:2.65,h:0.8,fontSize:14,color:'FFFFFF',align:'center'});});
+    sl.addNotes(noteRingkasan(st));
+    // 3 TAHAP doughnut
+    sl=pptx.addSlide(); head(sl,'Tahap Keseriusan Kes');
+    if(st.tot)sl.addChart(pptx.ChartType.doughnut,[{name:'Tahap',labels:['Ringan','Sederhana','Berat'],values:[st.sev.Ringan,st.sev.Sederhana,st.sev.Berat]}],{x:1.5,y:1.5,w:10.3,h:5.4,showLegend:true,legendPos:'r',legendFontSize:16,showValue:true,dataLabelFontSize:14,dataLabelColor:'FFFFFF',chartColors:['16A34A','D97706','DC2626'],holeSize:55});
+    sl.addNotes(noteTahap(st));
+    // 4 KATEGORI bar
+    sl=pptx.addSlide(); head(sl,'Kes Mengikut Kategori');
+    const kat=st.topKat.slice(0,8);
+    if(kat.length)sl.addChart(pptx.ChartType.bar,[{name:'Bilangan Kes',labels:kat.map(([id])=>katName(id)),values:kat.map(([,n])=>n)}],{x:0.6,y:1.4,w:12.1,h:5.5,barDir:'bar',showValue:true,dataLabelFontSize:12,chartColors:[BRAND],catAxisLabelFontSize:11});
+    sl.addNotes(noteKategori(st));
+    // 5 STATUS + KELAS
+    sl=pptx.addSlide(); head(sl,'Status Kes & Taburan Kelas');
+    sl.addText('Status Kes',{x:0.6,y:1.35,w:5.8,h:0.4,fontSize:16,bold:true,color:INK2});
+    sl.addChart(pptx.ChartType.bar,[{name:'Kes',labels:['Dilaporkan','Dalam Tindakan','Selesai'],values:[st.status.Dilaporkan,st.status['Dalam Tindakan'],st.status.Selesai]}],{x:0.6,y:1.8,w:5.9,h:4.9,barDir:'bar',showValue:true,chartColors:['2563EB']});
+    sl.addText('Kelas Teratas',{x:6.9,y:1.35,w:5.8,h:0.4,fontSize:16,bold:true,color:INK2});
+    const kls=st.topKls.slice(0,6);
+    if(kls.length)sl.addChart(pptx.ChartType.bar,[{name:'Kes',labels:kls.map(k=>k[0]),values:kls.map(k=>k[1])}],{x:6.9,y:1.8,w:5.9,h:4.9,barDir:'bar',showValue:true,chartColors:['3B82F6']});
+    sl.addNotes(noteKelas(st));
+    // 6 TREN line
+    sl=pptx.addSlide(); head(sl,'Tren Bulanan '+now.getFullYear());
+    sl.addChart(pptx.ChartType.line,[{name:'Kes',labels:BULAN,values:st.mon}],{x:0.6,y:1.4,w:12.1,h:5.5,lineDataSymbol:'circle',lineSize:2,chartColors:['3B82F6'],catAxisLabelFontSize:11});
+    sl.addNotes(noteTren(st));
+    // 7 RISIKO
+    sl=pptx.addSlide(); head(sl,'Murid Berisiko — Keutamaan Intervensi');
+    if(st.risk.length){
+      const rows=[[hdr('Murid'),hdr('Kelas'),hdr('Kes'),hdr('Tahap Risiko')]];
+      st.risk.slice(0,9).forEach(p=>rows.push([{text:p.nama,options:{fontSize:14}},{text:p.kelas,options:{fontSize:14}},{text:String(p.count),options:{fontSize:14,align:'center'}},{text:p.level,options:{fontSize:14,bold:true,color:riskColorHex(p.level).slice(1)}}]));
+      sl.addTable(rows,{x:0.6,y:1.5,w:12.1,border:{type:'solid',color:'E2E8F0',pt:1},valign:'middle',rowH:0.5,colW:[6.2,2.6,1.3,2.0]});
+    } else sl.addText('Tiada murid berulang kes — syabas!',{x:0.6,y:3,w:12.1,h:1,fontSize:22,color:INK2,align:'center'});
+    sl.addNotes(noteRisiko(st));
+    // 8 CADANGAN
+    sl=pptx.addSlide(); head(sl,'Cadangan & Tindakan Susulan');
+    sl.addText(reportRecs(st).map((r,i)=>({text:(i+1)+'.  '+r+'\n\n',options:{fontSize:18,color:INK}})),{x:0.85,y:1.6,w:11.6,h:5.2,valign:'top'});
+    sl.addNotes('Cadangan dijana automatik berdasarkan data semasa.');
+    // 9 PENUTUP
+    sl=pptx.addSlide(); sl.background={color:INK};
+    if(logo)sl.addImage({data:logo,x:6.05,y:1.4,w:1.25,h:1.33});
+    sl.addText('Disiplin Asas Kecemerlangan',{x:0.5,y:3.3,w:12.33,h:0.9,fontSize:32,bold:true,color:'FFFFFF',align:'center'});
+    sl.addText(`${S.nama}`,{x:0.5,y:4.3,w:12.33,h:0.5,fontSize:18,color:'93C5FD',align:'center'});
+    sl.addText(`Disediakan oleh ${S.guru}, Guru Disiplin`,{x:0.5,y:4.9,w:12.33,h:0.4,fontSize:14,color:'CBD5E1',align:'center'});
+    await pptx.writeFile({fileName:'Persembahan-Disiplin-'+S.kod+'-'+now.toISOString().slice(0,10)+'.pptx'});
+    toast('PPT dimuat turun');
+  }catch(e){toast('Gagal jana PPT: '+e.message);}
+  if(btn)btn.disabled=false;
 }
 
 /* ====================== SETTINGS / DATA ====================== */
