@@ -4,6 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Sistem Pengurusan Disiplin — SK Bandar Tawau 2026</title>
+<link rel="icon" type="image/png" href="logo.png">
+<link rel="apple-touch-icon" href="logo.png">
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Fira+Sans:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;500;600;700&display=swap');
 :root{
@@ -31,8 +33,8 @@ a{color:var(--brand-2);text-decoration:none;}
 .app{display:flex;min-height:100vh;}
 .sidebar{width:256px;background:linear-gradient(185deg,var(--sb),#0b1220);color:#cbd5e1;display:flex;flex-direction:column;position:fixed;inset:0 auto 0 0;z-index:40;border-right:1px solid var(--sb-line);}
 .brand{padding:20px 18px;border-bottom:1px solid var(--sb-line);display:flex;align-items:center;gap:12px;}
-.brand-logo{width:42px;height:42px;border-radius:12px;background:linear-gradient(135deg,var(--brand),var(--brand-2));display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 4px 14px rgba(37,99,235,.45);}
-.brand-logo .ic{width:22px;height:22px;stroke:#fff;}
+.brand-logo{width:44px;height:46px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.brand-logo img{width:100%;height:100%;object-fit:contain;}
 .brand-txt h1{font-size:14.5px;font-weight:700;color:#f8fafc;line-height:1.15;letter-spacing:-.2px;}
 .brand-txt p{font-size:10.5px;color:#64748b;margin-top:2px;font-family:var(--mono);letter-spacing:.3px;}
 .nav{flex:1;padding:14px 12px;display:flex;flex-direction:column;gap:3px;overflow-y:auto;}
@@ -261,8 +263,8 @@ tbody tr:hover{background:var(--surface-2);}
 .pres-slide h2{font-size:31px;font-weight:800;margin-bottom:24px;color:#1e3a8a;display:flex;align-items:center;gap:13px;}
 .pres-slide h2::before{content:'';width:8px;height:31px;border-radius:4px;background:linear-gradient(#1e40af,#3b82f6);}
 .pres-cover{background:radial-gradient(circle at 72% 28%,#1e3a8a,#0f172a);color:#fff;align-items:center;justify-content:center;text-align:center;}
-.pres-shield{width:94px;height:94px;border-radius:26px;background:linear-gradient(135deg,#1e40af,#3b82f6);display:flex;align-items:center;justify-content:center;margin-bottom:22px;box-shadow:0 0 50px rgba(59,130,246,.6);}
-.pres-shield svg{width:50px;height:50px;}
+.pres-crest{width:130px;height:138px;margin-bottom:20px;}
+.pres-crest img{width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 8px 26px rgba(0,0,0,.45));}
 .pres-kicker{font-size:14px;letter-spacing:3px;text-transform:uppercase;color:#93c5fd;margin-bottom:14px;}
 .pres-cover h1{font-size:50px;font-weight:800;line-height:1.1;margin-bottom:14px;color:#fff;}
 .pres-sub{font-size:21px;color:#cbd5e1;margin-bottom:32px;}
@@ -355,6 +357,7 @@ svg circle[data-tt],svg [data-drill]{cursor:pointer;}
   body{background:#fff;font-size:12px;} .print-head{display:block!important;}
 }
 .print-head{display:none;text-align:center;margin-bottom:18px;border-bottom:2px solid var(--brand);padding-bottom:12px;}
+.print-head .print-logo{width:66px;height:auto;display:block;margin:0 auto 8px;}
 .print-head h1{font-size:20px;color:var(--brand-d);}
 .print-head p{font-size:12px;color:#475569;margin-top:4px;}
 
@@ -414,7 +417,7 @@ svg circle[data-tt],svg [data-drill]{cursor:pointer;}
   <!-- ===== SIDEBAR ===== -->
   <aside class="sidebar" id="sidebar">
     <div class="brand">
-      <div class="brand-logo"><svg class="ic"><use href="#i-shield"/></svg></div>
+      <div class="brand-logo"><img src="logo.png" alt="Logo SK Bandar Tawau"></div>
       <div class="brand-txt">
         <h1>Unit Disiplin</h1>
         <p>SK BANDAR TAWAU · XBA3051</p>
@@ -530,7 +533,7 @@ svg circle[data-tt],svg [data-drill]{cursor:pointer;}
 
       <!-- ============ RISIKO ============ -->
       <section class="view" id="view-risiko">
-        <div class="print-head"><h1 id="rk-print-h"></h1><p>SENARAI MURID BERISIKO — Keutamaan Intervensi Disiplin</p></div>
+        <div class="print-head"><img src="logo.png" class="print-logo" alt="Logo SKBT"><h1 id="rk-print-h"></h1><p>SENARAI MURID BERISIKO — Keutamaan Intervensi Disiplin</p></div>
         <div class="kpi-grid">
           <div class="kpi"><div class="kpi-top"><div class="kpi-chip chip-amber"><svg class="ic"><use href="#i-users"/></svg></div></div><div class="num" id="rk-k-murid">0</div><div class="lbl">Murid Berulang (≥2 kes)</div></div>
           <div class="kpi"><div class="kpi-top"><div class="kpi-chip chip-red"><svg class="ic"><use href="#i-alert"/></svg></div></div><div class="num" id="rk-k-tinggi">0</div><div class="lbl">Berisiko Tinggi / Kritikal</div></div>
@@ -1362,7 +1365,7 @@ function buildReport(){
   list.forEach(c=>{sev[c.tahap]++;st[c.status]++;});
   const period=(fb!==''?BULAN[fb]+' ':'')+SETTINGS.sesi;
   document.getElementById('report-out').innerHTML=`
-    <div class="print-head"><h1>${esc(SETTINGS.nama)} (${esc(SETTINGS.kod)})</h1><p>LAPORAN PENGURUSAN DISIPLIN MURID — Unit HEM<br>Tempoh: ${esc(period)} · Dijana: ${fmtDate(new Date().toISOString())}</p></div>
+    <div class="print-head"><img src="logo.png" class="print-logo" alt="Logo SKBT"><h1>${esc(SETTINGS.nama)} (${esc(SETTINGS.kod)})</h1><p>LAPORAN PENGURUSAN DISIPLIN MURID — Unit HEM<br>Tempoh: ${esc(period)} · Dijana: ${fmtDate(new Date().toISOString())}</p></div>
     <div class="card">
       <div class="card-h"><h3>${ico('clipboard')} Ringkasan Laporan</h3><span class="ttl-sub">${list.length} kes${fk?' · '+esc(fk):''}${fc?' · '+esc(katName(fc)):''}</span></div>
       <div class="kpi-grid" style="margin-bottom:6px">
@@ -1487,7 +1490,7 @@ function buildPresSlides(){
   const st=computeStats(), S=SETTINGS, now=new Date();
   const tarikh=now.getDate()+' '+BULAN[now.getMonth()]+' '+now.getFullYear(), s=[];
   s.push(`<div class="pres-slide pres-cover">
-    <div class="pres-shield"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#i-shield"/></svg></div>
+    <div class="pres-crest"><img src="logo.png" alt="Logo SKBT"></div>
     <div class="pres-kicker">Sesi ${esc(S.sesi)} · Unit HEM</div>
     <h1>Rumusan Pengurusan<br>Disiplin Murid</h1>
     <div class="pres-sub">${esc(S.nama)} (${esc(S.kod)})</div>
@@ -1512,7 +1515,7 @@ function buildPresSlides(){
     <div><h3>Kelas Teratas</h3>${st.topKls.length?st.topKls.slice(0,5).map(([k,n])=>presBarSm(k,n,maxKls,'#3b82f6')).join(''):'<div class="pres-empty" style="font-size:16px">Tiada</div>'}</div></div></div>`);
   s.push(`<div class="pres-slide"><h2>Tren Bulanan ${now.getFullYear()}</h2><div style="flex:1;display:flex;align-items:center">${lineChart(st.mon)}</div></div>`);
   s.push(`<div class="pres-slide"><h2>Murid Berisiko — Keutamaan Intervensi</h2>${st.risk.length?`<div class="pres-risk">${st.risk.slice(0,5).map(p=>`<div class="pres-risk-row" style="border-left-color:${riskColorHex(p.level)}"><span class="rn">${esc(p.nama)}</span><span class="rk">${esc(p.kelas)} · ${p.level}</span><span class="rc" style="color:${riskColorHex(p.level)}">${p.count}</span></div>`).join('')}</div>`:'<div class="pres-empty">Tiada murid berulang kes — syabas!</div>'}</div>`);
-  s.push(`<div class="pres-slide pres-cover"><div class="pres-kicker">Terima Kasih</div><h1 style="font-size:42px">Disiplin Asas<br>Kecemerlangan</h1><div class="pres-sub">${esc(S.nama)}</div><div class="pres-foot" style="margin-top:18px">Disediakan oleh ${esc(S.guru)}, Guru Disiplin</div></div>`);
+  s.push(`<div class="pres-slide pres-cover"><div class="pres-crest" style="width:96px;height:102px;margin-bottom:16px"><img src="logo.png" alt="Logo SKBT"></div><div class="pres-kicker">Terima Kasih</div><h1 style="font-size:42px">Disiplin Asas<br>Kecemerlangan</h1><div class="pres-sub">${esc(S.nama)}</div><div class="pres-foot" style="margin-top:18px">Disediakan oleh ${esc(S.guru)}, Guru Disiplin</div></div>`);
   return s;
 }
 function startPresentation(){
