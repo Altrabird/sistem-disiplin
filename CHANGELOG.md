@@ -2,6 +2,16 @@
 
 Format based on [Keep a Changelog](https://keepachangelog.com/). Dates are absolute.
 
+## [1.4.0] — 2026-07-01
+
+### Added
+- **Export presentation to PowerPoint (.pptx)** — "Muat Turun PPT" in Mode Persembahan (and the report modal) generates a real, editable deck via PptxGenJS: cover with crest, KPIs, native doughnut/bar/line charts, at-risk table, recommendations, closing. The matching report narrative is attached as **speaker notes** on each slide so visuals and text tally (recommendations share one source).
+- **School crest** used in sidebar, header, presentation slides, report letterheads, and favicon.
+
+> PptxGenJS is loaded **on-demand from CDN** only when exporting — needs internet at that moment; the rest of the app stays offline-capable.
+
+---
+
 ## [1.3.0] — 2026-07-01
 
 ### Added
