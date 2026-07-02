@@ -1564,62 +1564,72 @@ async function downloadPPT(){
     const st=computeStats(), S=SETTINGS, now=new Date();
     const tarikh=now.getDate()+' '+BULAN[now.getMonth()]+' '+now.getFullYear();
     const logo=await logoDataUrl();
+    const TF='Cambria', BF='Calibri';
+    const INK='0F172A', INK2='475569', NAVY='1E3A8A', DARK='13224A', GOLD='F2A900';
+    const G='16A34A', A='D97706', R='DC2626', B='2563EB', CARD='F1F5F9', LINE='E2E8F0';
     const pptx=new PptxGenJS();
     pptx.layout='LAYOUT_WIDE'; pptx.author=S.guru; pptx.company=S.nama; pptx.subject='Pengurusan Disiplin'; pptx.title='Rumusan Pengurusan Disiplin Murid';
-    const BRAND='1E40AF', INK='0F172A', INK2='475569';
-    const head=(sl,t)=>{sl.background={color:'FFFFFF'};sl.addShape(pptx.ShapeType.rect,{x:0.6,y:0.55,w:0.14,h:0.56,fill:{color:BRAND}});sl.addText(t,{x:0.92,y:0.45,w:11.8,h:0.72,fontSize:26,bold:true,color:'1E3A8A'});};
-    const hdr=t=>({text:t,options:{bold:true,color:'FFFFFF',fill:{color:BRAND},fontSize:14}});
-    // 1 COVER
-    let sl=pptx.addSlide(); sl.background={color:INK};
-    if(logo)sl.addImage({data:logo,x:5.9,y:0.7,w:1.55,h:1.65});
-    sl.addText('RUMUSAN PENGURUSAN DISIPLIN MURID',{x:0.5,y:2.7,w:12.33,h:0.9,fontSize:33,bold:true,color:'FFFFFF',align:'center'});
-    sl.addText(`${S.nama} (${S.kod})`,{x:0.5,y:3.65,w:12.33,h:0.5,fontSize:20,color:'93C5FD',align:'center'});
-    sl.addText(`Guru Disiplin: ${S.guru}   |   Sesi ${S.sesi}   |   ${tarikh}`,{x:0.5,y:4.3,w:12.33,h:0.4,fontSize:14,color:'CBD5E1',align:'center'});
-    [['Jumlah Kes',st.tot],['Murid Berulang',st.risk.length],['Kes Selesai',st.status.Selesai]].forEach((c,i)=>{const x=3.55+i*2.15;sl.addText([{text:String(c[1])+'\n',options:{fontSize:32,bold:true,color:'60A5FA'}},{text:c[0],options:{fontSize:11,color:'CBD5E1'}}],{x,y:5.15,w:2,h:1,align:'center'});});
+    pptx.defineSlideMaster({title:'MASTER',background:{color:'FFFFFF'},
+      objects:[{text:{text:S.nama+'  ·  Unit HEM',options:{x:0.6,y:7.05,w:9,h:0.3,fontSize:9,color:'94A3B8',fontFace:BF}}}].concat(logo?[{image:{data:logo,x:12.55,y:6.9,w:0.42,h:0.45}}]:[]),
+      slideNumber:{x:11.55,y:7.05,w:0.9,h:0.3,fontSize:10,color:'94A3B8',fontFace:BF,align:'right'}});
+    const head=(sl,t)=>sl.addText(t,{x:0.6,y:0.4,w:12.1,h:0.8,fontSize:32,bold:true,color:NAVY,fontFace:TF});
+    const note=(sl,t)=>sl.addText(t,{x:0.6,y:6.2,w:11.9,h:0.7,fontSize:13,italic:true,color:INK2,fontFace:BF});
+    const chOpt={catAxisLabelFontFace:BF,valAxisLabelFontFace:BF,dataLabelFontFace:BF,legendFontFace:BF,catAxisLabelFontSize:11};
+    // 1 COVER (dark)
+    let sl=pptx.addSlide(); sl.background={color:DARK};
+    if(logo)sl.addImage({data:logo,x:5.99,y:0.55,w:1.35,h:1.44});
+    sl.addText('SESI '+String(S.sesi).toUpperCase()+'  ·  UNIT HEM',{x:0.5,y:2.15,w:12.33,h:0.4,fontSize:14,color:GOLD,align:'center',fontFace:BF,charSpacing:3});
+    sl.addText('Rumusan Pengurusan Disiplin Murid',{x:0.5,y:2.55,w:12.33,h:1.1,fontSize:40,bold:true,color:'FFFFFF',align:'center',fontFace:TF});
+    sl.addText(S.nama+' ('+S.kod+')',{x:0.5,y:3.7,w:12.33,h:0.5,fontSize:20,color:'CADCFC',align:'center',fontFace:BF});
+    sl.addText('“Ilmu Tangga Kejayaan”',{x:0.5,y:4.2,w:12.33,h:0.4,fontSize:14,italic:true,color:'93C5FD',align:'center',fontFace:TF});
+    [['Jumlah Kes',st.tot],['Murid Berulang',st.risk.length],['Kes Selesai',st.status.Selesai]].forEach((c,i)=>{const x=3.55+i*2.15;sl.addText([{text:String(c[1])+'\n',options:{fontSize:34,bold:true,color:GOLD,fontFace:TF}},{text:c[0],options:{fontSize:11,color:'CADCFC',fontFace:BF}}],{x,y:5.0,w:2,h:1,align:'center'});});
+    sl.addText('Guru Disiplin: '+S.guru+'   |   '+tarikh,{x:0.5,y:6.5,w:12.33,h:0.4,fontSize:12,color:'8FA3C8',align:'center',fontFace:BF});
     sl.addNotes(generateReportText());
-    // 2 KPI
-    sl=pptx.addSlide(); head(sl,'Ringkasan Keseluruhan');
-    [['Jumlah Kes',st.tot,BRAND],['Selesai ('+pctS(st.status.Selesai,st.tot)+'%)',st.status.Selesai,'16A34A'],['Dalam Tindakan',st.status['Dalam Tindakan'],'D97706'],['Murid Berulang',st.risk.length,'DC2626']].forEach((b,i)=>{const x=0.6+i*3.05;sl.addShape(pptx.ShapeType.roundRect,{x,y:2.1,w:2.75,h:2.7,fill:{color:b[2]},rectRadius:0.12});sl.addText(String(b[1]),{x,y:2.4,w:2.75,h:1.4,fontSize:50,bold:true,color:'FFFFFF',align:'center'});sl.addText(b[0],{x:x+0.05,y:3.8,w:2.65,h:0.8,fontSize:14,color:'FFFFFF',align:'center'});});
-    sl.addNotes(noteRingkasan(st));
+    // 2 KPI (stat cards)
+    sl=pptx.addSlide({masterName:'MASTER'}); head(sl,'Ringkasan Keseluruhan');
+    [['Jumlah Kes',st.tot,NAVY],['Kes Selesai',st.status.Selesai,G],['Dalam Tindakan',st.status['Dalam Tindakan'],A],['Murid Berulang',st.risk.length,R]].forEach((b,i)=>{const x=0.6+i*3.05;sl.addShape(pptx.ShapeType.roundRect,{x,y:1.9,w:2.8,h:2.9,fill:{color:CARD},line:{color:LINE,width:1},rectRadius:0.1});sl.addText(String(b[1]),{x,y:2.2,w:2.8,h:1.6,fontSize:60,bold:true,color:b[2],align:'center',fontFace:TF,margin:0});sl.addText(b[0],{x:x+0.1,y:3.95,w:2.6,h:0.6,fontSize:15,bold:true,color:INK2,align:'center',fontFace:BF});});
+    note(sl,noteRingkasan(st)); sl.addNotes(noteRingkasan(st));
     // 3 TAHAP doughnut
-    sl=pptx.addSlide(); head(sl,'Tahap Keseriusan Kes');
-    if(st.tot)sl.addChart(pptx.ChartType.doughnut,[{name:'Tahap',labels:['Ringan','Sederhana','Berat'],values:[st.sev.Ringan,st.sev.Sederhana,st.sev.Berat]}],{x:1.5,y:1.5,w:10.3,h:5.4,showLegend:true,legendPos:'r',legendFontSize:16,showValue:true,dataLabelFontSize:14,dataLabelColor:'FFFFFF',chartColors:['16A34A','D97706','DC2626'],holeSize:55});
-    sl.addNotes(noteTahap(st));
+    sl=pptx.addSlide({masterName:'MASTER'}); head(sl,'Tahap Keseriusan Kes');
+    if(st.tot)sl.addChart(pptx.ChartType.doughnut,[{name:'Tahap',labels:['Ringan','Sederhana','Berat'],values:[st.sev.Ringan,st.sev.Sederhana,st.sev.Berat]}],Object.assign({x:1.3,y:1.4,w:10.7,h:4.5,showLegend:true,legendPos:'r',legendFontSize:16,showValue:true,dataLabelFontSize:14,dataLabelColor:'FFFFFF',chartColors:[G,A,R],holeSize:58},chOpt));
+    else sl.addText('Tiada data',{x:0.6,y:3,w:12.1,h:1,align:'center',fontSize:20,color:INK2,fontFace:BF});
+    note(sl,noteTahap(st)); sl.addNotes(noteTahap(st));
     // 4 KATEGORI bar
-    sl=pptx.addSlide(); head(sl,'Kes Mengikut Kategori');
+    sl=pptx.addSlide({masterName:'MASTER'}); head(sl,'Kes Mengikut Kategori');
     const kat=st.topKat.slice(0,8);
-    if(kat.length)sl.addChart(pptx.ChartType.bar,[{name:'Bilangan Kes',labels:kat.map(([id])=>katName(id)),values:kat.map(([,n])=>n)}],{x:0.6,y:1.4,w:12.1,h:5.5,barDir:'bar',showValue:true,dataLabelFontSize:12,chartColors:[BRAND],catAxisLabelFontSize:11});
-    sl.addNotes(noteKategori(st));
-    // 5 STATUS + KELAS
-    sl=pptx.addSlide(); head(sl,'Status Kes & Taburan Kelas');
-    sl.addText('Status Kes',{x:0.6,y:1.35,w:5.8,h:0.4,fontSize:16,bold:true,color:INK2});
-    sl.addChart(pptx.ChartType.bar,[{name:'Kes',labels:['Dilaporkan','Dalam Tindakan','Selesai'],values:[st.status.Dilaporkan,st.status['Dalam Tindakan'],st.status.Selesai]}],{x:0.6,y:1.8,w:5.9,h:4.9,barDir:'bar',showValue:true,chartColors:['2563EB']});
-    sl.addText('Kelas Teratas',{x:6.9,y:1.35,w:5.8,h:0.4,fontSize:16,bold:true,color:INK2});
+    if(kat.length)sl.addChart(pptx.ChartType.bar,[{name:'Bilangan Kes',labels:kat.map(([id])=>katName(id)),values:kat.map(([,n])=>n)}],Object.assign({x:0.6,y:1.35,w:12.1,h:4.6,barDir:'bar',showValue:true,dataLabelFontSize:12,chartColors:[NAVY]},chOpt));
+    else sl.addText('Tiada data',{x:0.6,y:3,w:12.1,h:1,align:'center',fontSize:20,color:INK2,fontFace:BF});
+    note(sl,noteKategori(st)); sl.addNotes(noteKategori(st));
+    // 5 STATUS + KELAS (two-column)
+    sl=pptx.addSlide({masterName:'MASTER'}); head(sl,'Status Kes & Taburan Kelas');
+    sl.addText('Status Kes',{x:0.6,y:1.35,w:5.8,h:0.4,fontSize:16,bold:true,color:INK2,fontFace:BF});
+    sl.addChart(pptx.ChartType.bar,[{name:'Kes',labels:['Dilaporkan','Dalam Tindakan','Selesai'],values:[st.status.Dilaporkan,st.status['Dalam Tindakan'],st.status.Selesai]}],Object.assign({x:0.6,y:1.85,w:5.9,h:4.5,barDir:'bar',showValue:true,chartColors:[B]},chOpt));
+    sl.addText('Kelas Teratas',{x:6.9,y:1.35,w:5.8,h:0.4,fontSize:16,bold:true,color:INK2,fontFace:BF});
     const kls=st.topKls.slice(0,6);
-    if(kls.length)sl.addChart(pptx.ChartType.bar,[{name:'Kes',labels:kls.map(k=>k[0]),values:kls.map(k=>k[1])}],{x:6.9,y:1.8,w:5.9,h:4.9,barDir:'bar',showValue:true,chartColors:['3B82F6']});
+    if(kls.length)sl.addChart(pptx.ChartType.bar,[{name:'Kes',labels:kls.map(k=>k[0]),values:kls.map(k=>k[1])}],Object.assign({x:6.9,y:1.85,w:5.9,h:4.5,barDir:'bar',showValue:true,chartColors:['3B82F6']},chOpt));
     sl.addNotes(noteKelas(st));
     // 6 TREN line
-    sl=pptx.addSlide(); head(sl,'Tren Bulanan '+now.getFullYear());
-    sl.addChart(pptx.ChartType.line,[{name:'Kes',labels:BULAN,values:st.mon}],{x:0.6,y:1.4,w:12.1,h:5.5,lineDataSymbol:'circle',lineSize:2,chartColors:['3B82F6'],catAxisLabelFontSize:11});
-    sl.addNotes(noteTren(st));
-    // 7 RISIKO
-    sl=pptx.addSlide(); head(sl,'Murid Berisiko — Keutamaan Intervensi');
+    sl=pptx.addSlide({masterName:'MASTER'}); head(sl,'Tren Bulanan '+now.getFullYear());
+    sl.addChart(pptx.ChartType.line,[{name:'Kes',labels:BULAN,values:st.mon}],Object.assign({x:0.6,y:1.35,w:12.1,h:4.6,lineDataSymbol:'circle',lineSize:2,chartColors:['3B82F6']},chOpt));
+    note(sl,noteTren(st)); sl.addNotes(noteTren(st));
+    // 7 RISIKO table
+    sl=pptx.addSlide({masterName:'MASTER'}); head(sl,'Murid Berisiko — Keutamaan Intervensi');
     if(st.risk.length){
-      const rows=[[hdr('Murid'),hdr('Kelas'),hdr('Kes'),hdr('Tahap Risiko')]];
-      st.risk.slice(0,9).forEach(p=>rows.push([{text:p.nama,options:{fontSize:14}},{text:p.kelas,options:{fontSize:14}},{text:String(p.count),options:{fontSize:14,align:'center'}},{text:p.level,options:{fontSize:14,bold:true,color:riskColorHex(p.level).slice(1)}}]));
-      sl.addTable(rows,{x:0.6,y:1.5,w:12.1,border:{type:'solid',color:'E2E8F0',pt:1},valign:'middle',rowH:0.5,colW:[6.2,2.6,1.3,2.0]});
-    } else sl.addText('Tiada murid berulang kes — syabas!',{x:0.6,y:3,w:12.1,h:1,fontSize:22,color:INK2,align:'center'});
+      const hd=t=>({text:t,options:{bold:true,color:'FFFFFF',fill:{color:NAVY},fontSize:14,fontFace:BF}});
+      const rows=[[hd('Murid'),hd('Kelas'),hd('Bil. Kes'),hd('Tahap Risiko')]];
+      st.risk.slice(0,9).forEach((p,i)=>{const bg=i%2?'F8FAFC':'FFFFFF';rows.push([{text:p.nama,options:{fontSize:13,fill:{color:bg},fontFace:BF}},{text:p.kelas,options:{fontSize:13,fill:{color:bg},fontFace:BF}},{text:String(p.count),options:{fontSize:13,align:'center',fill:{color:bg},fontFace:BF}},{text:p.level,options:{fontSize:13,bold:true,color:riskColorHex(p.level).slice(1),fill:{color:bg},fontFace:BF}}]);});
+      sl.addTable(rows,{x:0.6,y:1.5,w:12.1,border:{type:'solid',color:LINE,pt:1},valign:'middle',rowH:0.5,colW:[6.2,2.6,1.3,2.0]});
+    } else sl.addText('Tiada murid berulang kes — syabas!',{x:0.6,y:3,w:12.1,h:1,fontSize:22,color:INK2,align:'center',fontFace:BF});
     sl.addNotes(noteRisiko(st));
-    // 8 CADANGAN
-    sl=pptx.addSlide(); head(sl,'Cadangan & Tindakan Susulan');
-    sl.addText(reportRecs(st).map((r,i)=>({text:(i+1)+'.  '+r+'\n\n',options:{fontSize:18,color:INK}})),{x:0.85,y:1.6,w:11.6,h:5.2,valign:'top'});
-    sl.addNotes('Cadangan dijana automatik berdasarkan data semasa.');
-    // 9 PENUTUP
-    sl=pptx.addSlide(); sl.background={color:INK};
-    if(logo)sl.addImage({data:logo,x:6.05,y:1.4,w:1.25,h:1.33});
-    sl.addText('Disiplin Asas Kecemerlangan',{x:0.5,y:3.3,w:12.33,h:0.9,fontSize:32,bold:true,color:'FFFFFF',align:'center'});
-    sl.addText(`${S.nama}`,{x:0.5,y:4.3,w:12.33,h:0.5,fontSize:18,color:'93C5FD',align:'center'});
-    sl.addText(`Disediakan oleh ${S.guru}, Guru Disiplin`,{x:0.5,y:4.9,w:12.33,h:0.4,fontSize:14,color:'CBD5E1',align:'center'});
+    // 8 CADANGAN (numbered icon rows)
+    sl=pptx.addSlide({masterName:'MASTER'}); head(sl,'Cadangan & Tindakan Susulan');
+    reportRecs(st).forEach((r,i)=>{const y=1.55+i*1.02;sl.addShape(pptx.ShapeType.ellipse,{x:0.7,y:y,w:0.6,h:0.6,fill:{color:NAVY}});sl.addText(String(i+1),{x:0.7,y:y,w:0.6,h:0.6,align:'center',valign:'middle',color:'FFFFFF',bold:true,fontSize:22,fontFace:TF,margin:0});sl.addText(r,{x:1.55,y:y-0.12,w:11,h:0.85,fontSize:16,color:INK,valign:'middle',fontFace:BF});});
+    // 9 PENUTUP (dark)
+    sl=pptx.addSlide(); sl.background={color:DARK};
+    if(logo)sl.addImage({data:logo,x:6.14,y:1.5,w:1.05,h:1.12});
+    sl.addText('Disiplin Asas Kecemerlangan',{x:0.5,y:3.1,w:12.33,h:0.9,fontSize:34,bold:true,color:'FFFFFF',align:'center',fontFace:TF});
+    sl.addText(S.nama,{x:0.5,y:4.1,w:12.33,h:0.5,fontSize:18,color:'CADCFC',align:'center',fontFace:BF});
+    sl.addText('Disediakan oleh '+S.guru+', Guru Disiplin',{x:0.5,y:4.7,w:12.33,h:0.4,fontSize:13,color:'8FA3C8',align:'center',fontFace:BF});
     await pptx.writeFile({fileName:'Persembahan-Disiplin-'+S.kod+'-'+now.toISOString().slice(0,10)+'.pptx'});
     toast('PPT dimuat turun');
   }catch(e){toast('Gagal jana PPT: '+e.message);}
